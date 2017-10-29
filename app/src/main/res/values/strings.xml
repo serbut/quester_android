@@ -4,4 +4,10 @@
     <string name="password_hint">Введите пароль</string>
     <string name="login_button_text">Войти</string>
     <string name="title_activity_map">Карта</string>
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
+    <string name="my_places">Мои места</string>
+    <string name="settings">Настройки</string>
+    <string name="favourites">Избранное</string>
+    <string name="map">Карта</string>
 </resources>
