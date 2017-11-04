@@ -10,4 +10,7 @@
     <string name="settings">Настройки</string>
     <string name="favourites">Избранное</string>
     <string name="map">Карта</string>
+    <string name="signup_button_text">Зарегистрироваться</string>
+    <string name="firstname_hint">Введите имя</string>
+    <string name="lastname_hint">Введите фамилию</string>
 </resources>

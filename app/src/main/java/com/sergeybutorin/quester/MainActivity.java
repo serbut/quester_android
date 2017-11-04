@@ -1,5 +1,6 @@
 package com.sergeybutorin.quester;
 
+import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.os.Bundle;
@@ -14,9 +15,22 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                    .detectDiskReads()
+                    .detectDiskWrites()
+                    .detectNetwork()   // or .detectAll() for all detectable problems
+                    .penaltyLog()
+                    .build());
+            StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+                    .detectLeakedSqlLiteObjects()
+                    .detectLeakedClosableObjects()
+                    .penaltyLog()
+                    .penaltyDeath()
+                    .build());
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -32,7 +46,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        getSupportFragmentManager().beginTransaction().replace(R.id.content, new QMapFragment()).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.content, new LoginFragment()).commit();
     }
 
     @Override
@@ -51,12 +65,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_my_places) {
-            Toast.makeText(this, "My places", Toast.LENGTH_LONG).show();
-        } else if (id == R.id.nav_favourites) {
-
-        } else if (id == R.id.nav_settings) {
-
+        switch (id) {
+            case R.id.nav_login:
+                getSupportFragmentManager().beginTransaction().replace(R.id.content, new LoginFragment()).commit();
+                break;
+            case R.id.nav_map:
+                getSupportFragmentManager().beginTransaction().replace(R.id.content, new QMapFragment()).commit();
+                break;
+            case R.id.nav_my_places:
+                Toast.makeText(this, "My places", Toast.LENGTH_LONG).show();
+                break;
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
