@@ -36,6 +36,8 @@ public class AuthFragment extends Fragment implements View.OnClickListener,
         AuthController.LoginListener,
         AuthController.SignupListener {
 
+    boolean signupMode = false;
+
     Button loginButton;
     Button signupButton;
     EditText emailEditText;
@@ -78,8 +80,16 @@ public class AuthFragment extends Fragment implements View.OnClickListener,
                 }
                 break;
             case R.id.button_signup:
-                controller.setLoginResultListener(null);
-                showSignupFields();
+                if (!signupMode) {
+                    controller.setLoginResultListener(null);
+                    showSignupFields();
+                } else if (checkSignupFields()) {
+                    System.out.println("Signup in fragment");
+                    controller.signup(emailEditText.getText().toString(),
+                            passwordEditText.getText().toString(),
+                            firstnameEditText.getText().toString(),
+                            lastnameEditText.getText().toString());
+                }
                 break;
         }
     }
@@ -92,6 +102,7 @@ public class AuthFragment extends Fragment implements View.OnClickListener,
     }
 
     private void showSignupFields() {
+        signupMode = true;
         loginButton.setVisibility(View.GONE);
         firstnameEditText.setVisibility(View.VISIBLE);
         lastnameEditText.setVisibility(View.VISIBLE);
@@ -106,6 +117,18 @@ public class AuthFragment extends Fragment implements View.OnClickListener,
         if (!emailEditText.getText().toString().matches(Constants.EMAIL_REGEX)){
             Toast.makeText(getContext(), R.string.error_incorrect_email, Toast.LENGTH_LONG).show();
             emailEditText.requestFocus();
+            return false;
+        }
+        return true;
+    }
+
+    private boolean checkSignupFields() {
+        if (!checkLoginFields()) {
+            return false;
+        }
+        if (firstnameEditText.getText().toString().length() == 0 ||
+                lastnameEditText.getText().toString().length() == 0) {
+            Toast.makeText(getContext(), R.string.error_empty_strings, Toast.LENGTH_LONG).show();
             return false;
         }
         return true;

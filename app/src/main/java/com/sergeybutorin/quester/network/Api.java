@@ -17,5 +17,5 @@ public interface Api {
     Call<UserProfile> login(@Body LoginRequest request);
 
     @POST("user/signup")
-    Call<Void> signup(@Body SignupRequest request);
+    Call<UserProfile> signup(@Body SignupRequest request);
 }

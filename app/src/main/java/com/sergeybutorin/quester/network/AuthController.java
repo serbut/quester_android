@@ -99,30 +99,46 @@ public class AuthController {
                         break;
                 }
                 if (loginResult != null) {
-                    loginResult.onResult(isSuccess, message, null);
+                    loginResult.onResult(false, message, null);
                 }
             }
 
             @Override
-            public void onFailure(Call<UserProfile> call, Throwable t) {
+            public void onFailure(@NonNull Call<UserProfile> call, @NonNull Throwable t) {
                 loginResult.onResult(false, R.string.error_network_message, null);
             }
         });
     }
 
     public void signup(String email, String password, String firstName, String lastName) {
-        api.signup(new SignupRequest(email, password, firstName, lastName)).enqueue(new Callback<Void>() {
+        api.signup(new SignupRequest(email, password, firstName, lastName)).enqueue(new Callback<UserProfile>() {
             @Override
-            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
+            public void onResponse(@NonNull Call<UserProfile> call, @NonNull Response<UserProfile> response) {
+                System.out.println("Signup in response" + response.body());
                 final boolean isSuccess = response.code() == 200;
                 if (isSuccess) {
-                    // success
+                    signupResult.onResult(true, R.string.auth_ok, response.body());
                     return;
+                }
+                int message;
+                switch (response.code()) {
+                    case 400:
+                        message = R.string.error_wrong_data;
+                        break;
+                    case 403:
+                        message = R.string.error_email_exists;
+                        break;
+                    default:
+                        message = R.string.error_message;
+                        break;
+                }
+                if (signupResult != null) {
+                    signupResult.onResult(false, message, null);
                 }
             }
 
             @Override
-            public void onFailure(Call<Void> call, Throwable t) {
+            public void onFailure(@NonNull Call<UserProfile> call, @NonNull Throwable t) {
                 signupResult.onResult(false, R.string.error_network_message, null);
             }
         });

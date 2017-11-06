@@ -7,13 +7,13 @@ package com.sergeybutorin.quester.model;
 public class SignupRequest {
     private String email;
     private String password;
-    private String firstName;
-    private String lastName;
+    private String firstname;
+    private String lastname;
 
-    public SignupRequest(String email, String password, String firstName, String lastName) {
+    public SignupRequest(String email, String password, String firstname, String lastname) {
         this.email = email;
         this.password = password;
-        this.firstName = firstName;
-        this.lastName = lastName;
+        this.firstname = firstname;
+        this.lastname = lastname;
     }
 }

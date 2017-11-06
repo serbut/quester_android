@@ -19,6 +19,7 @@
     <string name="error_wrong_data">Введены некорректные данные</string>
     <string name="error_incorrect_email">Введен некорректный email</string>
     <string name="error_empty_strings">Необходимо заполнить все поля</string>
+    <string name="error_email_exists">Пользователь с таким email уже зарегистрирован</string>
     <string name="auth_ok">Вы авторизованы</string>
     <string name="guest_name">Гость</string>
     <string name="nav_logout">Выйти</string>
