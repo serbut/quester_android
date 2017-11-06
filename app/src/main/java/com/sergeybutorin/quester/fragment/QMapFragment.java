@@ -1,4 +1,4 @@
-package com.sergeybutorin.quester;
+package com.sergeybutorin.quester.fragment;
 
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -23,6 +23,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.sergeybutorin.quester.R;
 
 /**
  * Created by sergeybutorin on 29/10/2017.
