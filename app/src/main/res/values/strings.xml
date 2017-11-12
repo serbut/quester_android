@@ -23,4 +23,6 @@
     <string name="auth_ok">Вы авторизованы</string>
     <string name="guest_name">Гость</string>
     <string name="nav_logout">Выйти</string>
+    <string name="quest_name_hint">Введите название квеста</string>
+    <string name="quest_add_btn">Добавить квест</string>
 </resources>

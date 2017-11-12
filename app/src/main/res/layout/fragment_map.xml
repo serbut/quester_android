@@ -14,16 +14,38 @@
         tools:context="com.sergeybutorin.quester.activity.MainActivity">
     </fragment>
 
-    <android.support.design.widget.CoordinatorLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:gravity="bottom|end"
+        android:orientation="vertical"
+        android:layout_marginBottom="@dimen/fab_margin">
 
         <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_add"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
-            android:layout_margin="@dimen/fab_margin"
+            android:layout_marginEnd="@dimen/fab_margin"
+            android:layout_marginBottom="@dimen/fab_margin"
             android:src="@drawable/ic_add_white_24px"
             app:backgroundTint="@color/colorAccent" />
-    </android.support.design.widget.CoordinatorLayout>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_done"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/fab_margin"
+            android:layout_marginBottom="@dimen/fab_margin"
+            android:src="@drawable/ic_done_white_24px"
+            app:backgroundTint="@color/colorAccent" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_clear"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/fab_margin"
+            android:layout_marginBottom="@dimen/fab_margin"
+            android:src="@drawable/ic_clear_white_24px"
+            app:backgroundTint="@color/colorAccent" />
+    </LinearLayout>
 </FrameLayout>

@@ -4,6 +4,7 @@ import android.content.SharedPreferences;
 import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.os.Bundle;
 import android.support.v4.view.GravityCompat;

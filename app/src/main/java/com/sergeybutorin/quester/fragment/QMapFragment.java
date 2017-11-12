@@ -6,6 +6,7 @@ import android.media.session.MediaSession;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -13,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -28,6 +30,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.sergeybutorin.quester.R;
 import com.sergeybutorin.quester.model.Quest;
+import com.sergeybutorin.quester.network.AuthController;
 
 import java.util.LinkedList;
 
@@ -36,12 +39,9 @@ import java.util.LinkedList;
  */
 
 public class QMapFragment extends Fragment implements OnMapReadyCallback {
-
     private static final String TAG = QMapFragment.class.getSimpleName();
 
     private GoogleMap mMap;
-
-    private LinkedList<Quest> quests = new LinkedList<>();
 
     private boolean mLocationPermissionGranted;
     // The entry point to the Fused Location Provider.
@@ -53,6 +53,17 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback {
     private static final int DEFAULT_ZOOM = 15;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private final LatLng mDefaultLocation = new LatLng(55.749465, 37.631988);
+
+
+    private enum QUESTS_STATE {DISPLAY, ADD};
+
+    private QUESTS_STATE state = QUESTS_STATE.DISPLAY;
+    private final LinkedList<Quest> quests = new LinkedList<>();
+    private Quest questToAdd = new Quest();
+    FloatingActionButton fabAdd;
+    FloatingActionButton fabDone;
+    FloatingActionButton fabClear;
+
 
     @Nullable
     @Override
@@ -67,9 +78,51 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback {
         // Construct a FusedLocationProviderClient.
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getContext());
 
-        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+        final SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+
+        fabAdd = view.findViewById(R.id.fab_add);
+        fabDone = view.findViewById(R.id.fab_done);
+        fabClear = view.findViewById(R.id.fab_clear);
+
+        fabAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                state = QUESTS_STATE.ADD;
+                switchState();
+            }
+        });
+        fabDone.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                state = QUESTS_STATE.DISPLAY;
+                for(Marker marker : questToAdd.getMarkers()) {
+                    marker.setIcon(BitmapDescriptorFactory
+                            .defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+                }
+                quests.add(questToAdd);
+                questToAdd = new Quest();
+                switchState();
+            }
+        });
+        fabClear.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                state = QUESTS_STATE.DISPLAY;
+                for(Marker marker : questToAdd.getMarkers()) {
+                    marker.remove();
+                }
+                questToAdd.clear();
+                switchState();
+            }
+        });
+
+
+        switchState();
+
+
+        // test quest
         Quest quest1 = new Quest();
         quest1.setName("kek");
         quest1.addPosition(new LatLng(55.7510, 37.6320));
@@ -109,17 +162,22 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback {
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng point) {
-//                mMap.clear();
-                Marker marker = mMap.addMarker(
-                        new MarkerOptions()
-                                .position(point)
-                                .title("title")
-                                .snippet("snippet")
-                                .icon(BitmapDescriptorFactory
-                                        .defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
-                );
-                LatLng position = marker.getPosition();
-                Log.d(TAG, position.latitude + ", " + position.longitude);
+                if (state == QUESTS_STATE.ADD) {
+//                  mMap.clear();
+                    Marker marker = mMap.addMarker(
+                            new MarkerOptions()
+                                    .position(point)
+                                    .title("title")
+                                    .snippet("snippet")
+                                    .draggable(true)
+                                    .icon(BitmapDescriptorFactory
+                                            .defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+                    );
+                    questToAdd.addMarkers(marker);
+
+                    LatLng position = marker.getPosition();
+                    Log.d(TAG, position.latitude + ", " + position.longitude);
+                }
             }
         });
     }
@@ -216,6 +274,21 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback {
             }
         } catch (SecurityException e)  {
             Log.e("Exception: %s", e.getMessage());
+        }
+    }
+
+    private void switchState() {
+        switch (state) {
+            case DISPLAY:
+                fabAdd.show();
+                fabDone.hide();
+                fabClear.hide();
+                break;
+            case ADD:
+                fabAdd.hide();
+                fabDone.show();
+                fabClear.show();
+                break;
         }
     }
 
