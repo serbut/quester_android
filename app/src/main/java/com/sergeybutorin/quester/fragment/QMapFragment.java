@@ -2,7 +2,6 @@ package com.sergeybutorin.quester.fragment;
 
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.media.session.MediaSession;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -14,7 +13,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -30,7 +28,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.sergeybutorin.quester.R;
 import com.sergeybutorin.quester.model.Quest;
-import com.sergeybutorin.quester.network.AuthController;
 
 import java.util.LinkedList;
 
@@ -55,14 +52,16 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback {
     private final LatLng mDefaultLocation = new LatLng(55.749465, 37.631988);
 
 
-    private enum QUESTS_STATE {DISPLAY, ADD};
+    private enum QUESTS_STATE {DISPLAY, ADD}
 
     private QUESTS_STATE state = QUESTS_STATE.DISPLAY;
     private final LinkedList<Quest> quests = new LinkedList<>();
+    private final java.util.HashMap<Marker, Quest> mapper = new java.util.HashMap<>();
     private Quest questToAdd = new Quest();
     FloatingActionButton fabAdd;
     FloatingActionButton fabDone;
     FloatingActionButton fabClear;
+    FloatingActionButton fabBack;
 
 
     @Nullable
@@ -85,6 +84,7 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback {
         fabAdd = view.findViewById(R.id.fab_add);
         fabDone = view.findViewById(R.id.fab_done);
         fabClear = view.findViewById(R.id.fab_clear);
+        fabBack = view.findViewById(R.id.fab_back);
 
         fabAdd.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -97,13 +97,14 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback {
             @Override
             public void onClick(View view) {
                 state = QUESTS_STATE.DISPLAY;
-                for(Marker marker : questToAdd.getMarkers()) {
-                    marker.setIcon(BitmapDescriptorFactory
-                            .defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
-                }
+//                for(Marker marker : questToAdd.getMarkers()) {
+//                    marker.setIcon(BitmapDescriptorFactory
+//                            .defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+//                }
                 quests.add(questToAdd);
                 questToAdd = new Quest();
                 switchState();
+                showQuests();
             }
         });
         fabClear.setOnClickListener(new View.OnClickListener() {
@@ -117,18 +118,33 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback {
                 switchState();
             }
         });
+        fabBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showQuests();
+            }
+        });
 
 
         switchState();
 
 
-        // test quest
+        // test quests
         Quest quest1 = new Quest();
-        quest1.setName("kek");
+        quest1.setName("test quest 1");
+        quest1.setDescription("test description 1");
         quest1.addPosition(new LatLng(55.7510, 37.6320));
         quest1.addPosition(new LatLng(55.7515, 37.6325));
         quest1.addPosition(new LatLng(55.7520, 37.6330));
         quests.add(quest1);
+
+        Quest quest2 = new Quest();
+        quest2.setName("test quest 2");
+        quest2.setDescription("test description 2");
+        quest2.addPosition(new LatLng(55.7410, 37.6220));
+        quest2.addPosition(new LatLng(55.7415, 37.6225));
+        quest2.addPosition(new LatLng(55.7420, 37.6230));
+        quests.add(quest2);
     }
 
     /**
@@ -143,6 +159,21 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                Quest quest = mapper.get(marker);
+                if (quest != null) {
+                    fabBack.show();
+                    showQuest(quest);
+                    Log.d(TAG, "onMarkerClick " + quest.getName());
+                } else {
+                    Log.d(TAG, "onMarkerClick ?");
+                }
+
+                return false; // TODO for what?
+            }
+        });
 
         // Add a marker in Moscow and move the camera
         mMap.addMarker(new MarkerOptions().position(mDefaultLocation).title("Marker in Moscow"));
@@ -171,8 +202,9 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback {
                                     .snippet("snippet")
                                     .draggable(true)
                                     .icon(BitmapDescriptorFactory
-                                            .defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+                                            .defaultMarker(BitmapDescriptorFactory.HUE_ROSE))
                     );
+                    questToAdd.addPosition(point);
                     questToAdd.addMarkers(marker);
 
                     LatLng position = marker.getPosition();
@@ -201,8 +233,8 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback {
                             mLastKnownLocation = task.getResult();
                             if (mLastKnownLocation != null) {
                                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                                    new LatLng(mLastKnownLocation.getLatitude(),
-                                        mLastKnownLocation.getLongitude()), DEFAULT_ZOOM));
+                                        new LatLng(mLastKnownLocation.getLatitude(),
+                                                mLastKnownLocation.getLongitude()), DEFAULT_ZOOM));
                             }
                         } else {
                             Log.d(TAG, "Current location is null. Using defaults.");
@@ -293,19 +325,37 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     private void showQuests() {
+        fabBack.hide();
+        mMap.clear();
+
         for(Quest quest : quests) {
-            int i = 1;
-            for (LatLng position: quest.getPositions()) {
-                mMap.addMarker(
-                        new MarkerOptions()
-                                .position(position)
-                                .title(quest.getName())
-                                .snippet("#" + i)
-                                .icon(BitmapDescriptorFactory.
-                                        defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
-                );
-                i++;
-            }
+            LatLng position = quest.getPositions().getFirst();
+            Marker marker = mMap.addMarker(
+                    new MarkerOptions()
+                            .position(position)
+                            .title(quest.getName())
+                            .snippet(quest.getDescription())
+                            .icon(BitmapDescriptorFactory.
+                                    defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
+            );
+            mapper.put(marker, quest);
+        }
+    }
+
+    private void showQuest(Quest quest) {
+        mMap.clear();
+
+        int i = 1;
+        for (LatLng position: quest.getPositions()) {
+            mMap.addMarker(
+                    new MarkerOptions()
+                            .position(position)
+                            .title(quest.getName())
+                            .snippet("#" + i)
+                            .icon(BitmapDescriptorFactory.
+                                    defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
+            );
+            i++;
         }
     }
 }

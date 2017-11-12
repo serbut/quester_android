@@ -7,7 +7,8 @@ import java.util.LinkedList;
 
 
 public class Quest {
-    private String name = "unknown";
+    private String name = "unknownQuestName";
+    private String description = "unknownQuestDescription";
     private LinkedList<LatLng> positions = new LinkedList<>();
     private LinkedList<Marker> markers = new LinkedList<>();
 
@@ -20,6 +21,14 @@ public class Quest {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public void addPosition(LatLng position) {
@@ -42,4 +51,6 @@ public class Quest {
         positions.clear();
         markers.clear();
     }
+
+
 }
