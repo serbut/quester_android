@@ -2,6 +2,7 @@ package com.sergeybutorin.quester.fragment;
 
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.media.session.MediaSession;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -19,11 +20,16 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.sergeybutorin.quester.R;
+import com.sergeybutorin.quester.model.Quest;
+
+import java.util.LinkedList;
 
 /**
  * Created by sergeybutorin on 29/10/2017.
@@ -34,6 +40,8 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback {
     private static final String TAG = QMapFragment.class.getSimpleName();
 
     private GoogleMap mMap;
+
+    private LinkedList<Quest> quests = new LinkedList<>();
 
     private boolean mLocationPermissionGranted;
     // The entry point to the Fused Location Provider.
@@ -61,6 +69,13 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback {
 
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        Quest quest1 = new Quest();
+        quest1.setName("kek");
+        quest1.addPosition(new LatLng(55.7510, 37.6320));
+        quest1.addPosition(new LatLng(55.7515, 37.6325));
+        quest1.addPosition(new LatLng(55.7520, 37.6330));
+        quests.add(quest1);
     }
 
     /**
@@ -77,10 +92,11 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback {
         mMap = googleMap;
 
         // Add a marker in Moscow and move the camera
-        LatLng moscow = new LatLng(55.749465, 37.631988);
-        mMap.addMarker(new MarkerOptions().position(moscow).title("Marker in Moscow"));
+        mMap.addMarker(new MarkerOptions().position(mDefaultLocation).title("Marker in Moscow"));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                moscow, DEFAULT_ZOOM));
+                mDefaultLocation, DEFAULT_ZOOM));
+
+        showQuests();
 
         getLocationPermission();
 
@@ -89,6 +105,23 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback {
 
         // Get the current location of the device and set the position of the map.
         getDeviceLocation();
+
+        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng point) {
+//                mMap.clear();
+                Marker marker = mMap.addMarker(
+                        new MarkerOptions()
+                                .position(point)
+                                .title("title")
+                                .snippet("snippet")
+                                .icon(BitmapDescriptorFactory
+                                        .defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+                );
+                LatLng position = marker.getPosition();
+                Log.d(TAG, position.latitude + ", " + position.longitude);
+            }
+        });
     }
 
     /**
@@ -108,9 +141,11 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback {
                         if (task.isSuccessful()) {
                             // Set the map's camera position to the current location of the device.
                             mLastKnownLocation = task.getResult();
-                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                            if (mLastKnownLocation != null) {
+                                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                                     new LatLng(mLastKnownLocation.getLatitude(),
-                                            mLastKnownLocation.getLongitude()), DEFAULT_ZOOM));
+                                        mLastKnownLocation.getLongitude()), DEFAULT_ZOOM));
+                            }
                         } else {
                             Log.d(TAG, "Current location is null. Using defaults.");
                             Log.e(TAG, "Exception: %s", task.getException());
@@ -181,6 +216,23 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback {
             }
         } catch (SecurityException e)  {
             Log.e("Exception: %s", e.getMessage());
+        }
+    }
+
+    private void showQuests() {
+        for(Quest quest : quests) {
+            int i = 1;
+            for (LatLng position: quest.getPositions()) {
+                mMap.addMarker(
+                        new MarkerOptions()
+                                .position(position)
+                                .title(quest.getName())
+                                .snippet("#" + i)
+                                .icon(BitmapDescriptorFactory.
+                                        defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
+                );
+                i++;
+            }
         }
     }
 }
