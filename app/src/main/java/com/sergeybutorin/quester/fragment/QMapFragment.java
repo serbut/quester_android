@@ -1,5 +1,7 @@
 package com.sergeybutorin.quester.fragment;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -37,6 +39,7 @@ import java.util.LinkedList;
 
 public class QMapFragment extends Fragment implements OnMapReadyCallback {
     private static final String TAG = QMapFragment.class.getSimpleName();
+    private OnQuestMarkerSelectedListener markerSelectedListener;
 
     private GoogleMap mMap;
 
@@ -68,6 +71,22 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_map, container, false);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        Activity activity;
+
+        if(context instanceof Activity){
+            activity = (Activity) context;
+            try{
+                markerSelectedListener = (OnQuestMarkerSelectedListener) activity;
+            } catch (ClassCastException e) {
+                Log.d(TAG, "Interface not implemented in parent activity");
+            }
+        }
     }
 
     @Override
@@ -136,6 +155,7 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback {
         quest1.addPosition(new LatLng(55.7510, 37.6320));
         quest1.addPosition(new LatLng(55.7515, 37.6325));
         quest1.addPosition(new LatLng(55.7520, 37.6330));
+        quest1.setRating(4.5);
         quests.add(quest1);
 
         Quest quest2 = new Quest();
@@ -144,7 +164,10 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback {
         quest2.addPosition(new LatLng(55.7410, 37.6220));
         quest2.addPosition(new LatLng(55.7415, 37.6225));
         quest2.addPosition(new LatLng(55.7420, 37.6230));
+        quest2.setRating(5.0);
         quests.add(quest2);
+
+        markerSelectedListener.onQuestSelected(quest2);
     }
 
     /**
@@ -164,8 +187,7 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback {
             public boolean onMarkerClick(Marker marker) {
                 Quest quest = mapper.get(marker);
                 if (quest != null) {
-                    fabBack.show();
-                    showQuest(quest);
+                    markerSelectedListener.onQuestSelected(quest);
                     Log.d(TAG, "onMarkerClick " + quest.getName());
                 } else {
                     Log.d(TAG, "onMarkerClick ?");
@@ -357,5 +379,9 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback {
             );
             i++;
         }
+    }
+
+    public interface OnQuestMarkerSelectedListener {
+        public void onQuestSelected(Quest quest);
     }
 }

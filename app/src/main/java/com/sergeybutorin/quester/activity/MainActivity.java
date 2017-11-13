@@ -22,10 +22,12 @@ import com.sergeybutorin.quester.Constants;
 import com.sergeybutorin.quester.R;
 import com.sergeybutorin.quester.fragment.AuthFragment;
 import com.sergeybutorin.quester.fragment.QMapFragment;
+import com.sergeybutorin.quester.fragment.QuestDetailsFragment;
+import com.sergeybutorin.quester.model.Quest;
 import com.sergeybutorin.quester.network.AuthController;
 
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, QMapFragment.OnQuestMarkerSelectedListener {
 
     TextView nameTextView;
     TextView emailTextView;
@@ -73,7 +75,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         setUserInformation();
 
-        getSupportFragmentManager().beginTransaction().replace(R.id.content, new QMapFragment()).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.content, new QuestDetailsFragment()).commit();
     }
 
     @Override
@@ -133,5 +135,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             loginItem.setVisible(true);
             logoutItem.setVisible(false);
         }
+    }
+
+    @Override
+    public void onQuestSelected(Quest quest) {
+        QuestDetailsFragment newFragment = new QuestDetailsFragment();
+        Bundle arguments = new Bundle();
+        arguments.putDouble(QuestDetailsFragment.RATING_KEY, quest.getRating());
+        arguments.putString(QuestDetailsFragment.DESCRIPTION_KEY, quest.getDescription());
+        arguments.putString(QuestDetailsFragment.NAME_KEY, quest.getName());
+        newFragment.setArguments(arguments);
+
+        getSupportFragmentManager().beginTransaction().replace(R.id.content, newFragment).commit();
     }
 }

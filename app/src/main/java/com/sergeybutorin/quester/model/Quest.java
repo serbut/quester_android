@@ -9,6 +9,16 @@ import java.util.LinkedList;
 public class Quest {
     private String name = "unknownQuestName";
     private String description = "unknownQuestDescription";
+    private double rating;
+
+    public double getRating() {
+        return rating;
+    }
+
+    public void setRating(double rating) {
+        this.rating = rating;
+    }
+
     private LinkedList<LatLng> positions = new LinkedList<>();
     private LinkedList<Marker> markers = new LinkedList<>();
 
