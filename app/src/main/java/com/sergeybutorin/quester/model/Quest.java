@@ -14,6 +14,14 @@ public class Quest {
     public Quest() {
     }
 
+    public Quest(String name,
+                 LinkedList<LatLng> positions) {
+        this.name = name;
+        this.positions = positions;
+        this.description = "Loaded from DB";
+
+    }
+
     public String getName() {
         return name;
     }

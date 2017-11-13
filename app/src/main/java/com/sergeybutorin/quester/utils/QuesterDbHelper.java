@@ -39,31 +39,32 @@ public class QuesterDbHelper extends SQLiteOpenHelper {
     }
 
     public static class QuestEntry implements BaseColumns {
-        static final String TABLE_NAME = "quest";
-        static final String COLUMN_NAME_USER = "user";
-        static final String COLUMN_NAME_TITLE = "title";
+        public static final String TABLE_NAME = "quest";
+        public static final String COLUMN_NAME_USER = "user";
+        public static final String COLUMN_NAME_TITLE = "title";
     }
 
     public static class PointEntry implements BaseColumns {
-        static final String TABLE_NAME = "point";
-        static final String COLUMN_NAME_QUEST = "quest_id";
-        static final String COLUMN_NAME_ORDER = "order";
-        static final String COLUMN_NAME_X = "x";
-        static final String COLUMN_NAME_Y = "y";
+        public static final String TABLE_NAME = "point";
+        public static final String COLUMN_NAME_QUEST = "quest_id";
+        public static final String COLUMN_NAME_ORDER = "order_number";
+        public static final String COLUMN_NAME_X = "x";
+        public static final String COLUMN_NAME_Y = "y";
     }
 
     private static final String SQL_CREATE_QUEST_TABLE =
             "CREATE TABLE " + QuestEntry.TABLE_NAME + " (" +
-                    QuestEntry._ID + " INTEGER PRIMARY KEY," +
-                    QuestEntry.COLUMN_NAME_USER + " VARCHAR(100) NOT NULL)," +
+                    QuestEntry._ID + " INTEGER PRIMARY KEY, " +
+                    QuestEntry.COLUMN_NAME_USER + " VARCHAR(100) NOT NULL, " +
                     QuestEntry.COLUMN_NAME_TITLE + " VARCHAR(100) NOT NULL)";
 
     private static final String SQL_CREATE_POINT_TABLE =
             "CREATE TABLE " + PointEntry.TABLE_NAME + " (" +
-                    PointEntry._ID + " INTEGER PRIMARY KEY," +
-                    PointEntry.COLUMN_NAME_QUEST + " INT REFERENCES " + QuestEntry.TABLE_NAME + "(" + QuestEntry._ID + ") NOT NULL)," +
-                    PointEntry.COLUMN_NAME_ORDER + " INT NOT NULL)," +
-                    PointEntry.COLUMN_NAME_X + " REAL NOT NULL)," +
+                    PointEntry._ID + " INTEGER PRIMARY KEY, " +
+                    PointEntry.COLUMN_NAME_QUEST + " INTEGER REFERENCES " +
+                    QuestEntry.TABLE_NAME + "(" + QuestEntry._ID + ") NOT NULL, " +
+                    PointEntry.COLUMN_NAME_ORDER + " INTEGER NOT NULL, " +
+                    PointEntry.COLUMN_NAME_X + " REAL NOT NULL, " +
                     PointEntry.COLUMN_NAME_Y + " REAL NOT NULL)";
 
     private static final String SQL_DELETE_QUEST_TABLE =

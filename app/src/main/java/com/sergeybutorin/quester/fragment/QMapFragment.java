@@ -1,8 +1,13 @@
 package com.sergeybutorin.quester.fragment;
 
+import android.content.ContentValues;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -26,10 +31,16 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.sergeybutorin.quester.Constants;
 import com.sergeybutorin.quester.R;
 import com.sergeybutorin.quester.model.Quest;
+import com.sergeybutorin.quester.utils.QuesterDbHelper;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by sergeybutorin on 29/10/2017.
@@ -62,6 +73,8 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback {
     FloatingActionButton fabDone;
     FloatingActionButton fabClear;
     FloatingActionButton fabBack;
+
+    private QuesterDbHelper dbHelper;
 
 
     @Nullable
@@ -101,6 +114,8 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback {
 //                    marker.setIcon(BitmapDescriptorFactory
 //                            .defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
 //                }
+                Log.d(TAG, "Save" + questToAdd.getPositions().size());
+                saveQuest(questToAdd);
                 quests.add(questToAdd);
                 questToAdd = new Quest();
                 switchState();
@@ -128,23 +143,7 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback {
 
         switchState();
 
-
-        // test quests
-        Quest quest1 = new Quest();
-        quest1.setName("test quest 1");
-        quest1.setDescription("test description 1");
-        quest1.addPosition(new LatLng(55.7510, 37.6320));
-        quest1.addPosition(new LatLng(55.7515, 37.6325));
-        quest1.addPosition(new LatLng(55.7520, 37.6330));
-        quests.add(quest1);
-
-        Quest quest2 = new Quest();
-        quest2.setName("test quest 2");
-        quest2.setDescription("test description 2");
-        quest2.addPosition(new LatLng(55.7410, 37.6220));
-        quest2.addPosition(new LatLng(55.7415, 37.6225));
-        quest2.addPosition(new LatLng(55.7420, 37.6230));
-        quests.add(quest2);
+        dbHelper = QuesterDbHelper.getInstance(getContext());
     }
 
     /**
@@ -212,6 +211,8 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback {
                 }
             }
         });
+
+        getQuests();
     }
 
     /**
@@ -357,5 +358,90 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback {
             );
             i++;
         }
+    }
+
+    private void saveQuest(final Quest quest) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                final SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getContext());
+                String user = sp.getString(Constants.USER_KEYS.EMAIL.getValue(), getResources().getString(R.string.guest_name));
+
+                SQLiteDatabase db = dbHelper.getWritableDatabase();
+                ContentValues questValues = new ContentValues();
+                questValues.put(QuesterDbHelper.QuestEntry.COLUMN_NAME_TITLE, quest.getName());
+                questValues.put(QuesterDbHelper.QuestEntry.COLUMN_NAME_USER, user);
+                long newRowId = db.insert(QuesterDbHelper.QuestEntry.TABLE_NAME, null, questValues);
+                int order = 0;
+                for (LatLng point : quest.getPositions()) {
+                    ContentValues pointValues = new ContentValues();
+                    pointValues.put(QuesterDbHelper.PointEntry.COLUMN_NAME_QUEST, newRowId);
+                    pointValues.put(QuesterDbHelper.PointEntry.COLUMN_NAME_ORDER, order++);
+                    pointValues.put(QuesterDbHelper.PointEntry.COLUMN_NAME_X, point.latitude);
+                    pointValues.put(QuesterDbHelper.PointEntry.COLUMN_NAME_Y, point.longitude);
+                    Log.d(TAG, "Point in (" + point.latitude + ", " + point.longitude + ") saved");
+                    db.insert(QuesterDbHelper.PointEntry.TABLE_NAME, null, pointValues);
+                }
+            }
+        }).start();
+    }
+
+    private void getQuests() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Log.d(TAG, "Reading started");
+
+                SQLiteDatabase db = dbHelper.getReadableDatabase();
+                String[] questProjection = {
+                        QuesterDbHelper.QuestEntry._ID,
+                        QuesterDbHelper.QuestEntry.COLUMN_NAME_TITLE
+                };
+                String sortOrder =
+                        QuesterDbHelper.QuestEntry._ID;
+                Cursor cursor = db.query(
+                        QuesterDbHelper.QuestEntry.TABLE_NAME,
+                        questProjection, null,null,
+                        null,null, sortOrder);
+
+                Map <Integer, String> questIdTitle= new HashMap<>();
+                while(cursor.moveToNext()) {
+                    int id = cursor.getInt(cursor.getColumnIndexOrThrow(QuesterDbHelper.QuestEntry._ID));
+                    String title = cursor.getString(
+                            cursor.getColumnIndexOrThrow(QuesterDbHelper.QuestEntry.COLUMN_NAME_TITLE));
+                    questIdTitle.put(id, title);
+                    Log.d(TAG, title);
+                }
+
+                String[] pointProjection = {
+                        QuesterDbHelper.PointEntry.COLUMN_NAME_ORDER,
+                        QuesterDbHelper.PointEntry.COLUMN_NAME_X,
+                        QuesterDbHelper.PointEntry.COLUMN_NAME_Y
+                };
+                String selection = QuesterDbHelper.PointEntry._ID + " = ?";
+                sortOrder = QuesterDbHelper.PointEntry.COLUMN_NAME_ORDER;
+                for (Integer id : questIdTitle.keySet()) {
+                    Log.d(TAG, "Quest " + id);
+                    String[] selectionArgs = { String.valueOf(id) };
+
+                    cursor = db.query(
+                            QuesterDbHelper.PointEntry.TABLE_NAME,
+                            pointProjection, selection,
+                            selectionArgs,
+                            null,null, sortOrder);
+                    LinkedList<LatLng> coordinates = new LinkedList<>();
+                    while(cursor.moveToNext()) {
+                        double x = cursor.getDouble(cursor.getColumnIndexOrThrow(QuesterDbHelper.PointEntry.COLUMN_NAME_X));
+                        double y = cursor.getDouble(cursor.getColumnIndexOrThrow(QuesterDbHelper.PointEntry.COLUMN_NAME_Y));
+                        LatLng ll = new LatLng(x, y);
+                        coordinates.add(ll);
+                        Log.d(TAG, "Point in (" + x + ", " + y + ")");
+                    }
+                    Quest quest = new Quest("123", coordinates);
+                    quests.add(quest);
+                }
+                cursor.close();
+            }
+        }).start();
     }
 }
