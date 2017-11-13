@@ -29,7 +29,7 @@ public class AuthController {
     private LoginListener loginResult;
     private SignupListener signupResult;
 
-    public AuthController(Context context) {
+    private AuthController() {
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
 
         Retrofit.Builder builder =
@@ -43,9 +43,9 @@ public class AuthController {
         api = retrofit.create(Api.class);
     }
 
-    public static synchronized AuthController getInstance(Context context) {
+    public static synchronized AuthController getInstance() {
         if (instance == null) {
-            instance = new AuthController(context);
+            instance = new AuthController();
         }
         return instance;
     }

@@ -86,7 +86,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 
@@ -98,9 +97,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
             case R.id.nav_map:
                 getSupportFragmentManager().beginTransaction().replace(R.id.content, new QMapFragment()).commit();
-                break;
-            case R.id.nav_my_places:
-                Toast.makeText(this, "My places", Toast.LENGTH_LONG).show();
                 break;
             case R.id.nav_logout:
                 AuthController.logout(getApplicationContext());

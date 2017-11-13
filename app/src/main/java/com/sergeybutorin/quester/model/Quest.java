@@ -5,7 +5,6 @@ import com.google.android.gms.maps.model.Marker;
 
 import java.util.LinkedList;
 
-
 public class Quest {
     private String name = "unknownQuestName";
     private String description = "unknownQuestDescription";
@@ -51,6 +50,4 @@ public class Quest {
         positions.clear();
         markers.clear();
     }
-
-
 }

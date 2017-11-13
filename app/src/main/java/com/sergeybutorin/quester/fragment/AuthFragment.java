@@ -52,7 +52,7 @@ public class AuthFragment extends Fragment implements View.OnClickListener,
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_login, container, false);
 
-        controller = new AuthController(getContext());
+        controller = AuthController.getInstance();
         controller.setLoginResultListener(this);
         controller.setSignupResultListener(this);
 
