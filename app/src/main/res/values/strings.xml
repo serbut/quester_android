@@ -25,4 +25,6 @@
     <string name="nav_logout">Выйти</string>
     <string name="quest_name_hint">Введите название квеста</string>
     <string name="quest_add_btn">Добавить квест</string>
+    <string name="error_no_points_quests">Вы должны добавить точки в квест</string>
+    <string name="quest_saved">Квест успешно сохранен</string>
 </resources>
