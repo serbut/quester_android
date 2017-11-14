@@ -53,7 +53,7 @@ public class QuestsGetTask extends AsyncTask<Void, Quest, Void> {
                 QuesterDbHelper.PointEntry.COLUMN_NAME_X,
                 QuesterDbHelper.PointEntry.COLUMN_NAME_Y
         };
-        String selection = QuesterDbHelper.PointEntry._ID + " = ?";
+        String selection = QuesterDbHelper.PointEntry.COLUMN_NAME_QUEST + " = ?";
         sortOrder = QuesterDbHelper.PointEntry.COLUMN_NAME_ORDER;
         for (Integer id : questIdTitle.keySet()) {
             String[] selectionArgs = { String.valueOf(id) };
