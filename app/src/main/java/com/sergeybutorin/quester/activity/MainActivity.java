@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         setUserInformation();
 
-        getSupportFragmentManager().beginTransaction().replace(R.id.content, new QuestDetailsFragment()).commit();
+//        getSupportFragmentManager().beginTransaction().replace(R.id.content, new QuestDetailsFragment()).commit();
     }
 
     @Override
