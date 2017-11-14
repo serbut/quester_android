@@ -4,7 +4,6 @@ import android.content.SharedPreferences;
 import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.os.Bundle;
 import android.support.v4.view.GravityCompat;
@@ -16,7 +15,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.sergeybutorin.quester.Constants;
 import com.sergeybutorin.quester.R;
@@ -27,12 +25,12 @@ import com.sergeybutorin.quester.network.AuthController;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
-    TextView nameTextView;
-    TextView emailTextView;
-    NavigationView navigationView;
-    Menu menu;
-    MenuItem loginItem;
-    MenuItem logoutItem;
+    private TextView nameTextView;
+    private TextView emailTextView;
+    private NavigationView navigationView;
+    private Menu menu;
+    private MenuItem loginItem;
+    private MenuItem logoutItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

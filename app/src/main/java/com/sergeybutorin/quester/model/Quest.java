@@ -9,7 +9,7 @@ public class Quest {
     private String name = "unknownQuestName";
     private String description = "unknownQuestDescription";
     private LinkedList<LatLng> positions = new LinkedList<>();
-    private LinkedList<Marker> markers = new LinkedList<>();
+    private final LinkedList<Marker> markers = new LinkedList<>();
 
     public Quest() {
     }

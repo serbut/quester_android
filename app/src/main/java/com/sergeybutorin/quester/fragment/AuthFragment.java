@@ -3,7 +3,6 @@ package com.sergeybutorin.quester.fragment;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -16,17 +15,8 @@ import android.widget.Toast;
 import com.sergeybutorin.quester.Constants;
 import com.sergeybutorin.quester.R;
 import com.sergeybutorin.quester.activity.MainActivity;
-import com.sergeybutorin.quester.model.LoginRequest;
 import com.sergeybutorin.quester.model.UserProfile;
-import com.sergeybutorin.quester.network.Api;
 import com.sergeybutorin.quester.network.AuthController;
-
-import okhttp3.OkHttpClient;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * Created by sergeybutorin on 03/11/2017.
@@ -36,14 +26,14 @@ public class AuthFragment extends Fragment implements View.OnClickListener,
         AuthController.LoginListener,
         AuthController.SignupListener {
 
-    boolean signupMode = false;
+    private boolean signupMode = false;
 
-    Button loginButton;
-    Button signupButton;
-    EditText emailEditText;
-    EditText passwordEditText;
-    EditText firstnameEditText;
-    EditText lastnameEditText;
+    private Button loginButton;
+    private Button signupButton;
+    private EditText emailEditText;
+    private EditText passwordEditText;
+    private EditText firstnameEditText;
+    private EditText lastnameEditText;
 
     private AuthController controller;
 

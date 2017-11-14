@@ -5,10 +5,10 @@ package com.sergeybutorin.quester.model;
  */
 
 public class SignupRequest {
-    private String email;
-    private String password;
-    private String firstname;
-    private String lastname;
+    private final String email;
+    private final String password;
+    private final String firstname;
+    private final String lastname;
 
     public SignupRequest(String email, String password, String firstname, String lastname) {
         this.email = email;

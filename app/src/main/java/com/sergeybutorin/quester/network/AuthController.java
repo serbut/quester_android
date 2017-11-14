@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
-import android.widget.Toast;
 
 import com.sergeybutorin.quester.Constants;
 import com.sergeybutorin.quester.R;

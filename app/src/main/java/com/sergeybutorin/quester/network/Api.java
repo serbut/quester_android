@@ -12,7 +12,7 @@ import retrofit2.http.POST;
  * Created by sergeybutorin on 05/11/2017.
  */
 
-public interface Api {
+interface Api {
     @POST("user/login")
     Call<UserProfile> login(@Body LoginRequest request);
 

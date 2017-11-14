@@ -1,8 +1,6 @@
 package com.sergeybutorin.quester.fragment;
 
 import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -35,9 +33,7 @@ import com.sergeybutorin.quester.utils.QuestAddTask;
 import com.sergeybutorin.quester.utils.QuesterDbHelper;
 import com.sergeybutorin.quester.utils.QuestsGetTask;
 
-import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Map;
 
 /**
  * Created by sergeybutorin on 29/10/2017.
@@ -66,10 +62,10 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback {
     private final LinkedList<Quest> quests = new LinkedList<>();
     private final java.util.HashMap<Marker, Quest> mapper = new java.util.HashMap<>();
     private Quest questToAdd = new Quest();
-    FloatingActionButton fabAdd;
-    FloatingActionButton fabDone;
-    FloatingActionButton fabClear;
-    FloatingActionButton fabBack;
+    private FloatingActionButton fabAdd;
+    private FloatingActionButton fabDone;
+    private FloatingActionButton fabClear;
+    private FloatingActionButton fabBack;
 
     private QuesterDbHelper dbHelper;
     private QuestAddTask questSaver;

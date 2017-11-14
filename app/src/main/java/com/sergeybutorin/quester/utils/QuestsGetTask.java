@@ -3,7 +3,6 @@ package com.sergeybutorin.quester.utils;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.sergeybutorin.quester.fragment.QMapFragment;
