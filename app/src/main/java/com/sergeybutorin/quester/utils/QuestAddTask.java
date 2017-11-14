@@ -29,7 +29,8 @@ public class QuestAddTask extends AsyncTask<Quest, Void, Void> {
     @Override
     protected Void doInBackground(Quest... quests) {
         final SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(fragment.getContext());
-        String user = sp.getString(Constants.USER_KEYS.EMAIL.getValue(), "123");
+        String user = sp.getString(Constants.USER_KEYS.EMAIL.getValue(),
+                fragment.getResources().getString(R.string.guest_name));
 
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues questValues = new ContentValues();

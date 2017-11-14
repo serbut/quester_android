@@ -70,7 +70,7 @@ public class QuestsGetTask extends AsyncTask<Void, Quest, Void> {
                 LatLng ll = new LatLng(x, y);
                 coordinates.add(ll);
             }
-            Quest quest = new Quest("123", coordinates);
+            Quest quest = new Quest(questIdTitle.get(id), coordinates);
             publishProgress(quest);
             cursor.close();
         }

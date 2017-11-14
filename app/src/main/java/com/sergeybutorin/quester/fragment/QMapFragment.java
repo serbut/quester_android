@@ -55,7 +55,6 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback {
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private final LatLng mDefaultLocation = new LatLng(55.749465, 37.631988);
 
-
     private enum QUESTS_STATE {DISPLAY, ADD}
 
     private QUESTS_STATE state = QUESTS_STATE.DISPLAY;
@@ -69,7 +68,6 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback {
 
     private QuesterDbHelper dbHelper;
     private QuestAddTask questSaver;
-    private QuestsGetTask questGetter;
 
     @Nullable
     @Override
@@ -99,6 +97,7 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback {
                 switchState();
             }
         });
+
         fabDone.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -106,10 +105,7 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback {
                     Toast.makeText(getContext(), R.string.error_no_points_quests, Toast.LENGTH_SHORT).show();
                 } else {
                     state = QUESTS_STATE.DISPLAY;
-//                for(Marker marker : questToAdd.getMarkers()) {
-//                    marker.setIcon(BitmapDescriptorFactory
-//                            .defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
-//                }
+
                     Log.d(TAG, "Save" + questToAdd.getPositions().size());
                     questSaver = new QuestAddTask(dbHelper, QMapFragment.this);
                     questSaver.execute(questToAdd);
@@ -172,26 +168,18 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback {
             }
         });
 
-        // Add a marker in Moscow and move the camera
-        mMap.addMarker(new MarkerOptions().position(mDefaultLocation).title("Marker in Moscow"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                mDefaultLocation, DEFAULT_ZOOM));
-
         showQuests();
 
         getLocationPermission();
 
-        // Turn on the My Location layer and the related control on the map.
         updateLocationUI();
 
-        // Get the current location of the device and set the position of the map.
         getDeviceLocation();
 
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng point) {
                 if (state == QUESTS_STATE.ADD) {
-//                  mMap.clear();
                     Marker marker = mMap.addMarker(
                             new MarkerOptions()
                                     .position(point)
@@ -210,7 +198,7 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback {
             }
         });
 
-        questGetter = new QuestsGetTask(dbHelper, this);
+        QuestsGetTask questGetter = new QuestsGetTask(dbHelper, this);
         questGetter.execute();
     }
 
