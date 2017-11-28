@@ -20,7 +20,9 @@ import com.sergeybutorin.quester.Constants;
 import com.sergeybutorin.quester.R;
 import com.sergeybutorin.quester.fragment.AuthFragment;
 import com.sergeybutorin.quester.fragment.QMapFragment;
+import com.sergeybutorin.quester.model.UserProfile;
 import com.sergeybutorin.quester.network.AuthController;
+import com.sergeybutorin.quester.utils.SPHelper;
 
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -31,6 +33,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Menu menu;
     private MenuItem loginItem;
     private MenuItem logoutItem;
+    private SPHelper spHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +72,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         loginItem = menu.findItem(R.id.nav_login);
         logoutItem = menu.findItem(R.id.nav_logout);
 
+        spHelper = SPHelper.getInstance(getApplicationContext());
+
         setUserInformation();
 
         getSupportFragmentManager().beginTransaction().replace(R.id.content, new QMapFragment()).commit();
@@ -97,7 +102,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 getSupportFragmentManager().beginTransaction().replace(R.id.content, new QMapFragment()).commit();
                 break;
             case R.id.nav_logout:
-                AuthController.logout(getApplicationContext());
+                spHelper.removeUserData();
                 setUserInformation();
                 break;
         }
@@ -108,14 +113,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     public void setUserInformation() {
-        if (AuthController.isAuthorized(getApplicationContext())) {
-            final SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-            String name = sp.getString(Constants.USER_KEYS.FIRSTNAME.getValue(), null) + " " +
-                    sp.getString(Constants.USER_KEYS.LASTNAME.getValue(), null);
+        UserProfile user = spHelper.getCurrentUser();
+        if (user != null) {
+            String name = user.getFirstName() + " " + user.getLastName();
             nameTextView.setText(name);
 
             emailTextView.setVisibility(View.VISIBLE);
-            emailTextView.setText(sp.getString(Constants.USER_KEYS.EMAIL.getValue(), null));
+            emailTextView.setText(user.getEmail());
 
             loginItem.setVisible(false);
             logoutItem.setVisible(true);

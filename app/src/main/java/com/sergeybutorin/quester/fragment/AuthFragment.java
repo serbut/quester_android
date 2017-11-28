@@ -17,6 +17,7 @@ import com.sergeybutorin.quester.R;
 import com.sergeybutorin.quester.activity.MainActivity;
 import com.sergeybutorin.quester.model.UserProfile;
 import com.sergeybutorin.quester.network.AuthController;
+import com.sergeybutorin.quester.utils.SPHelper;
 
 /**
  * Created by sergeybutorin on 03/11/2017.
@@ -42,7 +43,7 @@ public class AuthFragment extends Fragment implements View.OnClickListener,
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_login, container, false);
 
-        controller = AuthController.getInstance();
+        controller = AuthController.getInstance(getContext());
         controller.setLoginResultListener(this);
         controller.setSignupResultListener(this);
 
@@ -129,13 +130,8 @@ public class AuthFragment extends Fragment implements View.OnClickListener,
         if (!success) {
             Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
         } else if (user != null) {
-            final SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getContext());
-            SharedPreferences.Editor editor = sp.edit();
-            editor.putString(Constants.USER_KEYS.EMAIL.getValue(), user.getEmail());
-            editor.putString(Constants.USER_KEYS.FIRSTNAME.getValue(), user.getFirstName());
-            editor.putString(Constants.USER_KEYS.LASTNAME.getValue(), user.getLastName());
-            editor.putString(Constants.USER_KEYS.TOKEN.getValue(), user.getToken());
-            editor.apply();
+            SPHelper.getInstance(getContext()).setUserData(user);
+
             getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.content, new QMapFragment()).commit();
             ((MainActivity)getActivity()).setUserInformation();
         }

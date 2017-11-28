@@ -12,6 +12,7 @@ import com.sergeybutorin.quester.Constants;
 import com.sergeybutorin.quester.R;
 import com.sergeybutorin.quester.fragment.QMapFragment;
 import com.sergeybutorin.quester.model.Quest;
+import com.sergeybutorin.quester.model.UserProfile;
 
 /**
  * Created by sergeybutorin on 14/11/2017.
@@ -28,14 +29,16 @@ public class QuestAddTask extends AsyncTask<Quest, Void, Void> {
 
     @Override
     protected Void doInBackground(Quest... quests) {
-        final SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(fragment.getContext());
-        String user = sp.getString(Constants.USER_KEYS.EMAIL.getValue(),
-                fragment.getResources().getString(R.string.guest_name));
+        UserProfile user = SPHelper.getInstance(fragment.getContext()).getCurrentUser(); // TODO: remove, check that user is not null
+        if (user == null) {
+            return null;
+        }
+        String email = user.getEmail();
 
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues questValues = new ContentValues();
         questValues.put(QuesterDbHelper.QuestEntry.COLUMN_NAME_TITLE, quests[0].getName());
-        questValues.put(QuesterDbHelper.QuestEntry.COLUMN_NAME_USER, user);
+        questValues.put(QuesterDbHelper.QuestEntry.COLUMN_NAME_USER, email);
         long newRowId = db.insert(QuesterDbHelper.QuestEntry.TABLE_NAME, null, questValues);
         int order = 0;
         for (LatLng point : quests[0].getPositions()) {

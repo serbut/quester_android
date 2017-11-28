@@ -10,6 +10,7 @@ import com.sergeybutorin.quester.R;
 import com.sergeybutorin.quester.model.LoginRequest;
 import com.sergeybutorin.quester.model.SignupRequest;
 import com.sergeybutorin.quester.model.UserProfile;
+import com.sergeybutorin.quester.utils.SPHelper;
 
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
@@ -28,7 +29,7 @@ public class AuthController {
     private LoginListener loginResult;
     private SignupListener signupResult;
 
-    private AuthController() {
+    private AuthController(Context context) {
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
 
         Retrofit.Builder builder =
@@ -42,30 +43,11 @@ public class AuthController {
         api = retrofit.create(Api.class);
     }
 
-    public static synchronized AuthController getInstance() {
+    public static synchronized AuthController getInstance(Context context) {
         if (instance == null) {
-            instance = new AuthController();
+            instance = new AuthController(context);
         }
         return instance;
-    }
-
-    public static boolean isAuthorized(Context context) {
-        final SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-        for (Constants.USER_KEYS key : Constants.USER_KEYS.values()) {
-            if (!sp.contains(key.getValue())) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public static void logout(Context context) {
-        final SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor editor = sp.edit();
-        for (Constants.USER_KEYS key : Constants.USER_KEYS.values()) {
-            editor.remove(key.getValue());
-        }
-        editor.apply();
     }
 
     public void setLoginResultListener(LoginListener listener) {
