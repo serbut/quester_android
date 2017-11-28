@@ -28,6 +28,7 @@ public class QuestsGetTask extends AsyncTask<Void, Quest, Void> {
     @Override
     protected Void doInBackground(Void... voids) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
+
         String[] questProjection = {
                 QuesterDbHelper.QuestEntry._ID,
                 QuesterDbHelper.QuestEntry.COLUMN_NAME_TITLE
@@ -71,6 +72,7 @@ public class QuestsGetTask extends AsyncTask<Void, Quest, Void> {
                 coordinates.add(ll);
             }
             Quest quest = new Quest(questIdTitle.get(id), coordinates);
+            if (isCancelled()) return null;
             publishProgress(quest);
             cursor.close();
         }

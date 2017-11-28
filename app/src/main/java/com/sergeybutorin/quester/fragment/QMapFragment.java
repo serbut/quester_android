@@ -40,7 +40,7 @@ import java.util.LinkedList;
  */
 
 public class QMapFragment extends Fragment implements OnMapReadyCallback {
-    private static final String TAG = QMapFragment.class.getSimpleName();
+    public static final String TAG = QMapFragment.class.getSimpleName();
 
     private GoogleMap mMap;
 
@@ -68,6 +68,7 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback {
 
     private QuesterDbHelper dbHelper;
     private QuestAddTask questSaver;
+    private QuestsGetTask questGetter;
 
     @Nullable
     @Override
@@ -158,7 +159,7 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback {
                 Quest quest = mapper.get(marker);
                 if (quest != null) {
                     fabBack.show();
-                    showQuest(quest);
+                    showQuestDetail(quest);
                     Log.d(TAG, "onMarkerClick " + quest.getName());
                 } else {
                     Log.d(TAG, "onMarkerClick ?");
@@ -198,8 +199,16 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback {
             }
         });
 
-        QuestsGetTask questGetter = new QuestsGetTask(dbHelper, this);
+        questGetter = new QuestsGetTask(dbHelper, this);
         questGetter.execute();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (questGetter != null) {
+            questGetter.cancel(false);
+        }
     }
 
     /**
@@ -323,20 +332,24 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback {
         mMap.clear();
 
         for(Quest quest : quests) {
-            LatLng position = quest.getPositions().getFirst();
-            Marker marker = mMap.addMarker(
-                    new MarkerOptions()
-                            .position(position)
-                            .title(quest.getName())
-                            .snippet(quest.getDescription())
-                            .icon(BitmapDescriptorFactory.
-                                    defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
-            );
-            mapper.put(marker, quest);
+            showQuest(quest);
         }
     }
 
     private void showQuest(Quest quest) {
+        LatLng position = quest.getPositions().getFirst();
+        Marker marker = mMap.addMarker(
+                new MarkerOptions()
+                        .position(position)
+                        .title(quest.getName())
+                        .snippet(quest.getDescription())
+                        .icon(BitmapDescriptorFactory.
+                                defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
+        );
+        mapper.put(marker, quest);
+    }
+
+    private void showQuestDetail(Quest quest) {
         mMap.clear();
 
         int i = 1;
@@ -355,6 +368,6 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback {
 
     public void addQuest(Quest quest) {
         quests.add(quest);
-        showQuests();
+        showQuest(quest);
     }
 }
