@@ -1,6 +1,7 @@
 package com.sergeybutorin.quester.fragment;
 
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
@@ -58,6 +59,8 @@ public class AuthFragment extends Fragment implements View.OnClickListener,
 
         loginButton.setOnClickListener(this);
         signupButton.setOnClickListener(this);
+
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         return view;
     }

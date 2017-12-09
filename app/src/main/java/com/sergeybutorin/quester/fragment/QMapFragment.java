@@ -1,5 +1,6 @@
 package com.sergeybutorin.quester.fragment;
 
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -89,6 +90,8 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback,
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
 
         // Construct a FusedLocationProviderClient.
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getContext());
@@ -395,19 +398,17 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback,
             } else if (quest != null) {
                 QuestAddTask questAddTask = new QuestAddTask(dbHelper, QMapFragment.this);
                 questAddTask.execute(quest);
-                quests.add(quest);
+                addQuest(quest);
             }
         }
     }
 
     @Override
-    public void onGetResult(boolean success, int message, Quest quest) {
-        if (mMap != null) {
-            if (!success) {
-                Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
-            } else if (quest != null) {
-                addQuest(quest);
-            }
+    public void onGetResult(boolean success, Quest quest) {
+        if (mMap != null && quest != null) {
+            QuestAddTask questAddTask = new QuestAddTask(dbHelper, QMapFragment.this);
+            questAddTask.execute(quest);
+            addQuest(quest);
         }
     }
 

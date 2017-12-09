@@ -26,17 +26,11 @@ public class QuestAddTask extends AsyncTask<Quest, Void, Void> {
 
     @Override
     protected Void doInBackground(Quest... quests) {
-        UserProfile user = SPHelper.getInstance(fragment.getContext()).getCurrentUser(); // TODO: remove, check that user is not null
-        if (user == null) {
-            return null;
-        }
-        String email = user.getEmail();
-
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues questValues = new ContentValues();
         questValues.put(QuesterDbHelper.QuestEntry._ID, quests[0].getId());
         questValues.put(QuesterDbHelper.QuestEntry.COLUMN_NAME_TITLE, quests[0].getTitle());
-        questValues.put(QuesterDbHelper.QuestEntry.COLUMN_NAME_USER, email);
+        questValues.put(QuesterDbHelper.QuestEntry.COLUMN_NAME_USER, "todo"); // TODO
         long newRowId = db.insert(QuesterDbHelper.QuestEntry.TABLE_NAME, null, questValues);
         int order = 0;
         for (LatLng point : quests[0].getPoints()) {
@@ -48,11 +42,5 @@ public class QuestAddTask extends AsyncTask<Quest, Void, Void> {
             db.insert(QuesterDbHelper.PointEntry.TABLE_NAME, null, pointValues);
         }
         return null;
-    }
-
-    @Override
-    protected void onPostExecute(Void aVoid) {
-        super.onPostExecute(aVoid);
-        Toast.makeText(fragment.getContext(), R.string.quest_saved, Toast.LENGTH_LONG).show();
     }
 }

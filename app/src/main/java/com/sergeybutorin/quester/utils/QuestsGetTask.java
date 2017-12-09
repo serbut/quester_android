@@ -34,6 +34,7 @@ public class QuestsGetTask extends AsyncTask<Void, Quest, Void> {
         String[] questProjection = {
                 QuesterDbHelper.QuestEntry._ID,
                 QuesterDbHelper.QuestEntry.COLUMN_NAME_TITLE,
+                QuesterDbHelper.QuestEntry.COLUMN_NAME_VERSION,
                 QuesterDbHelper.QuestEntry.COLUMN_NAME_DESCRIPTION
         };
         String sortOrder =
@@ -89,8 +90,8 @@ public class QuestsGetTask extends AsyncTask<Void, Quest, Void> {
     protected void onProgressUpdate(Quest... values) {
         super.onProgressUpdate(values);
         for (Quest q : values) {
+            Log.d("QUEST", "Quest loaded");
             fragment.addQuest(q);
-            Log.d("QuestsGetTask", "Квест "+ q.getId() + " " + q.getPoints());
         }
     }
 }

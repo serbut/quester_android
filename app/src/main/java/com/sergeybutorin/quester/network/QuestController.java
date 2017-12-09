@@ -8,7 +8,9 @@ import com.sergeybutorin.quester.R;
 import com.sergeybutorin.quester.model.Quest;
 import com.sergeybutorin.quester.model.QuestBase;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
@@ -65,7 +67,7 @@ public class QuestController {
             public void onResponse(@NonNull Call<Quest> call, @NonNull Response<Quest> response) {
                 final boolean isSuccess = response.code() == 200;
                 if (isSuccess) {
-                    addQuestListener.onAddResult(true, R.string.quest_server_ok, response.body());
+                    addQuestListener.onAddResult(true, R.string.quest_saved, response.body());
                 } else {
                     addQuestListener.onAddResult(false, R.string.error_message, null);
                 }
@@ -83,10 +85,16 @@ public class QuestController {
             @Override
             public void onResponse(@NonNull Call<List<QuestBase>> call, @NonNull Response<List<QuestBase>> response) {
                 final boolean isSuccess = response.code() == 200;
-                if (isSuccess) {
-                    for (QuestBase quest : response.body()) {
+                final List<QuestBase> quests = response.body();
+                if (isSuccess && quests != null) {
+                    Map<Integer, Integer> idVersionQuest = new HashMap<>();
+                    for (QuestBase q : savedQuests) {
+                        idVersionQuest.put(q.getId(), q.getVersion());
+                    }
+                    for (QuestBase quest : quests) {
                         int id = quest.getId();
-                        if (!savedQuests.contains(id)) {
+                        if (!idVersionQuest.containsKey(id) ||
+                                idVersionQuest.get(id) < quest.getVersion()) {
                             getDetails(id);
                         }
                     }
@@ -106,16 +114,16 @@ public class QuestController {
             public void onResponse(@NonNull Call<Quest> call, @NonNull Response<Quest> response) {
                 final boolean isSuccess = response.code() == 200;
                 if (isSuccess) {
-                    getQuestListener.onGetResult(true, R.string.quest_received, response.body());
+                    getQuestListener.onGetResult(true, response.body());
                 } else {
-                    getQuestListener.onGetResult(false, R.string.error_message, null);
+                    getQuestListener.onGetResult(false, null);
                 }
 
             }
 
             @Override
             public void onFailure(@NonNull Call<Quest> call, @NonNull Throwable t) {
-                getQuestListener.onGetResult(false, R.string.error_network_message, null);
+                getQuestListener.onGetResult(false, null);
             }
         });
     }
@@ -125,6 +133,6 @@ public class QuestController {
     }
 
     public interface GetQuestListener {
-        void onGetResult(boolean success, int message, Quest quest);
+        void onGetResult(boolean success, Quest quest);
     }
 }
