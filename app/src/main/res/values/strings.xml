@@ -18,10 +18,13 @@
     <string name="error_empty_strings">Необходимо заполнить все поля</string>
     <string name="error_email_exists">Пользователь с таким email уже зарегистрирован</string>
     <string name="auth_ok">Вы авторизованы</string>
+    <string name="quest_server_ok">Квест сохранен на сервере</string>
     <string name="guest_name">Гость</string>
     <string name="nav_logout">Выйти</string>
     <string name="quest_name_hint">Введите название квеста</string>
     <string name="quest_add_btn">Добавить квест</string>
     <string name="error_no_points_quests">Вы должны добавить точки в квест</string>
+    <string name="error_no_authorized_quest">Вы должны авторизованы, чтобы добавлять квесты</string>
     <string name="quest_saved">Квест успешно сохранен</string>
+    <string name="quest_received">Загружен новый квест с сервера</string>
 </resources>

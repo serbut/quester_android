@@ -29,17 +29,24 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.sergeybutorin.quester.R;
 import com.sergeybutorin.quester.model.Quest;
+import com.sergeybutorin.quester.model.QuestBase;
+import com.sergeybutorin.quester.network.QuestController;
+import com.sergeybutorin.quester.utils.GetQuestListTask;
 import com.sergeybutorin.quester.utils.QuestAddTask;
 import com.sergeybutorin.quester.utils.QuesterDbHelper;
 import com.sergeybutorin.quester.utils.QuestsGetTask;
+import com.sergeybutorin.quester.utils.SPHelper;
 
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created by sergeybutorin on 29/10/2017.
  */
 
-public class QMapFragment extends Fragment implements OnMapReadyCallback {
+public class QMapFragment extends Fragment implements OnMapReadyCallback,
+        QuestController.AddQuestListener,
+        QuestController.GetQuestListener {
     public static final String TAG = QMapFragment.class.getSimpleName();
 
     private GoogleMap mMap;
@@ -67,8 +74,10 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback {
     private FloatingActionButton fabBack;
 
     private QuesterDbHelper dbHelper;
-    private QuestAddTask questSaver;
-    private QuestsGetTask questGetter;
+    private QuestsGetTask questsGetTask;
+
+    private QuestController controller;
+
 
     @Nullable
     @Override
@@ -102,21 +111,28 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback {
         fabDone.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (questToAdd.getPositions().size() < 1) {
+                if (questToAdd.getPoints().size() < 1) {
                     Toast.makeText(getContext(), R.string.error_no_points_quests, Toast.LENGTH_SHORT).show();
                 } else {
                     state = QUESTS_STATE.DISPLAY;
 
-                    Log.d(TAG, "Save" + questToAdd.getPositions().size());
-                    questSaver = new QuestAddTask(dbHelper, QMapFragment.this);
-                    questSaver.execute(questToAdd);
-                    quests.add(questToAdd);
-                    questToAdd = new Quest();
-                    switchState();
-                    showQuests();
+                    Log.d(TAG, "Save" + questToAdd.getPoints().size());
+
+                    String token = SPHelper.getInstance(getContext()).getUserToken();
+
+                    if (token == null) {
+                        Toast.makeText(getContext(), R.string.error_no_authorized_quest, Toast.LENGTH_LONG).show();
+                    } else {
+                        controller.add(questToAdd, token);
+
+                        questToAdd = new Quest();
+                        switchState();
+                        showQuests();
+                    }
                 }
             }
         });
+
         fabClear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -128,6 +144,7 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback {
                 switchState();
             }
         });
+
         fabBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -135,10 +152,16 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback {
             }
         });
 
-
         switchState();
 
         dbHelper = QuesterDbHelper.getInstance(getContext());
+
+        GetQuestListTask getQuestListTask = new GetQuestListTask(dbHelper, this);
+        getQuestListTask.execute();
+
+        controller = QuestController.getInstance();
+        controller.setAddQuestListener(this);
+        controller.setGetQuestListener(this);
     }
 
     /**
@@ -160,7 +183,7 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback {
                 if (quest != null) {
                     fabBack.show();
                     showQuestDetail(quest);
-                    Log.d(TAG, "onMarkerClick " + quest.getName());
+                    Log.d(TAG, "onMarkerClick " + quest.getTitle());
                 } else {
                     Log.d(TAG, "onMarkerClick ?");
                 }
@@ -190,7 +213,7 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback {
                                     .icon(BitmapDescriptorFactory
                                             .defaultMarker(BitmapDescriptorFactory.HUE_ROSE))
                     );
-                    questToAdd.addPosition(point);
+                    questToAdd.addPoint(point);
                     questToAdd.addMarkers(marker);
 
                     LatLng position = marker.getPosition();
@@ -199,15 +222,15 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback {
             }
         });
 
-        questGetter = new QuestsGetTask(dbHelper, this);
-        questGetter.execute();
+        questsGetTask = new QuestsGetTask(dbHelper, this);
+        questsGetTask.execute();
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        if (questGetter != null) {
-            questGetter.cancel(false);
+        if (questsGetTask != null) {
+            questsGetTask.cancel(false);
         }
     }
 
@@ -337,11 +360,11 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     private void showQuest(Quest quest) {
-        LatLng position = quest.getPositions().getFirst();
+        LatLng position = quest.getPoints().getFirst();
         Marker marker = mMap.addMarker(
                 new MarkerOptions()
                         .position(position)
-                        .title(quest.getName())
+                        .title(quest.getTitle())
                         .snippet(quest.getDescription())
                         .icon(BitmapDescriptorFactory.
                                 defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
@@ -353,11 +376,11 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback {
         mMap.clear();
 
         int i = 1;
-        for (LatLng position: quest.getPositions()) {
+        for (LatLng position: quest.getPoints()) {
             mMap.addMarker(
                     new MarkerOptions()
                             .position(position)
-                            .title(quest.getName())
+                            .title(quest.getTitle())
                             .snippet("#" + i)
                             .icon(BitmapDescriptorFactory.
                                     defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
@@ -369,5 +392,29 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback {
     public void addQuest(Quest quest) {
         quests.add(quest);
         showQuest(quest);
+    }
+
+    @Override
+    public void onAddResult(boolean success, int message, Quest quest) {
+        if (!success) {
+            Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
+        } else if (quest != null) {
+            QuestAddTask questAddTask = new QuestAddTask(dbHelper, QMapFragment.this);
+            questAddTask.execute(quest);
+            quests.add(quest);
+        }
+    }
+
+    @Override
+    public void onGetResult(boolean success, int message, Quest quest) {
+        if (!success) {
+            Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
+        } else if (quest != null) {
+            quests.add(quest);
+        }
+    }
+
+    public void getNewQuests(List<QuestBase> existingQuests) {
+        controller.getMissing(existingQuests);
     }
 }

@@ -40,8 +40,10 @@ public class QuesterDbHelper extends SQLiteOpenHelper {
 
     public static class QuestEntry implements BaseColumns {
         public static final String TABLE_NAME = "quest";
+        public static final String COLUMN_NAME_VERSION = "version";
         public static final String COLUMN_NAME_USER = "user";
         public static final String COLUMN_NAME_TITLE = "title";
+        public static final String COLUMN_NAME_DESCRIPTION = "description";
     }
 
     public static class PointEntry implements BaseColumns {
@@ -55,8 +57,11 @@ public class QuesterDbHelper extends SQLiteOpenHelper {
     private static final String SQL_CREATE_QUEST_TABLE =
             "CREATE TABLE " + QuestEntry.TABLE_NAME + " (" +
                     QuestEntry._ID + " INTEGER PRIMARY KEY, " +
+                    QuestEntry.COLUMN_NAME_VERSION + " INTEGER DEFAULT 0, " +
                     QuestEntry.COLUMN_NAME_USER + " VARCHAR(100) NOT NULL, " +
+                    QuestEntry.COLUMN_NAME_DESCRIPTION + " VARCHAR(300) DEFAULT NULL, " +
                     QuestEntry.COLUMN_NAME_TITLE + " VARCHAR(100) NOT NULL)";
+
 
     private static final String SQL_CREATE_POINT_TABLE =
             "CREATE TABLE " + PointEntry.TABLE_NAME + " (" +

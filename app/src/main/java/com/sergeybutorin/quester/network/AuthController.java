@@ -29,7 +29,7 @@ public class AuthController {
     private LoginListener loginResult;
     private SignupListener signupResult;
 
-    private AuthController(Context context) {
+    private AuthController() {
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
 
         Retrofit.Builder builder =
@@ -43,9 +43,9 @@ public class AuthController {
         api = retrofit.create(Api.class);
     }
 
-    public static synchronized AuthController getInstance(Context context) {
+    public static synchronized AuthController getInstance() {
         if (instance == null) {
-            instance = new AuthController(context);
+            instance = new AuthController();
         }
         return instance;
     }
@@ -95,7 +95,6 @@ public class AuthController {
         api.signup(new SignupRequest(email, password, firstName, lastName)).enqueue(new Callback<UserProfile>() {
             @Override
             public void onResponse(@NonNull Call<UserProfile> call, @NonNull Response<UserProfile> response) {
-                System.out.println("Signup in response" + response.body());
                 final boolean isSuccess = response.code() == 200;
                 if (isSuccess) {
                     signupResult.onResult(true, R.string.auth_ok, response.body());

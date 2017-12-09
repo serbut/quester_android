@@ -5,29 +5,28 @@ import com.google.android.gms.maps.model.Marker;
 
 import java.util.LinkedList;
 
-public class Quest {
-    private String name = "unknownQuestName";
+public class Quest extends QuestBase {
+    private String title = "unknownQuestName";
     private String description = "unknownQuestDescription";
-    private LinkedList<LatLng> positions = new LinkedList<>();
+    private LinkedList<LatLng> points = new LinkedList<>();
     private final LinkedList<Marker> markers = new LinkedList<>();
 
     public Quest() {
     }
 
-    public Quest(String name,
-                 LinkedList<LatLng> positions) {
-        this.name = name;
-        this.positions = positions;
+    public Quest(String title,
+                 LinkedList<LatLng> points) {
+        this.title = title;
+        this.points = points;
         this.description = "Loaded from DB";
-
     }
 
-    public String getName() {
-        return name;
+    public String getTitle() {
+        return title;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getDescription() {
@@ -38,12 +37,12 @@ public class Quest {
         this.description = description;
     }
 
-    public void addPosition(LatLng position) {
-        positions.add(position);
+    public void addPoint(LatLng point) {
+        points.add(point);
     }
 
-    public LinkedList<LatLng> getPositions() {
-        return positions;
+    public LinkedList<LatLng> getPoints() {
+        return points;
     }
 
     public void addMarkers(Marker marker) {
@@ -55,7 +54,7 @@ public class Quest {
     }
 
     public void clear() {
-        positions.clear();
+        points.clear();
         markers.clear();
     }
 }

@@ -1,14 +1,11 @@
 package com.sergeybutorin.quester.utils;
 
 import android.content.ContentValues;
-import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
-import android.preference.PreferenceManager;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
-import com.sergeybutorin.quester.Constants;
 import com.sergeybutorin.quester.R;
 import com.sergeybutorin.quester.fragment.QMapFragment;
 import com.sergeybutorin.quester.model.Quest;
@@ -37,11 +34,11 @@ public class QuestAddTask extends AsyncTask<Quest, Void, Void> {
 
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues questValues = new ContentValues();
-        questValues.put(QuesterDbHelper.QuestEntry.COLUMN_NAME_TITLE, quests[0].getName());
+        questValues.put(QuesterDbHelper.QuestEntry.COLUMN_NAME_TITLE, quests[0].getTitle());
         questValues.put(QuesterDbHelper.QuestEntry.COLUMN_NAME_USER, email);
         long newRowId = db.insert(QuesterDbHelper.QuestEntry.TABLE_NAME, null, questValues);
         int order = 0;
-        for (LatLng point : quests[0].getPositions()) {
+        for (LatLng point : quests[0].getPoints()) {
             ContentValues pointValues = new ContentValues();
             pointValues.put(QuesterDbHelper.PointEntry.COLUMN_NAME_QUEST, newRowId);
             pointValues.put(QuesterDbHelper.PointEntry.COLUMN_NAME_ORDER, order++);

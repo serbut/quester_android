@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,7 +44,7 @@ public class AuthFragment extends Fragment implements View.OnClickListener,
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_login, container, false);
 
-        controller = AuthController.getInstance(getContext());
+        controller = AuthController.getInstance();
         controller.setLoginResultListener(this);
         controller.setSignupResultListener(this);
 
@@ -75,7 +76,6 @@ public class AuthFragment extends Fragment implements View.OnClickListener,
                     controller.setLoginResultListener(null);
                     showSignupFields();
                 } else if (checkSignupFields()) {
-                    System.out.println("Signup in fragment");
                     controller.signup(emailEditText.getText().toString(),
                             passwordEditText.getText().toString(),
                             firstnameEditText.getText().toString(),
@@ -100,8 +100,8 @@ public class AuthFragment extends Fragment implements View.OnClickListener,
     }
 
     private boolean checkLoginFields() {
-        if (emailEditText.getText().toString().length() == 0 ||
-                passwordEditText.getText().toString().length() == 0) {
+        if (TextUtils.isEmpty(emailEditText.getText().toString()) ||
+                TextUtils.isEmpty(passwordEditText.getText().toString())) {
             Toast.makeText(getContext(), R.string.error_empty_strings, Toast.LENGTH_LONG).show();
             return false;
         }
@@ -117,8 +117,8 @@ public class AuthFragment extends Fragment implements View.OnClickListener,
         if (!checkLoginFields()) {
             return false;
         }
-        if (firstnameEditText.getText().toString().length() == 0 ||
-                lastnameEditText.getText().toString().length() == 0) {
+        if (TextUtils.isEmpty(firstnameEditText.getText().toString()) ||
+                TextUtils.isEmpty(lastnameEditText.getText().toString())) {
             Toast.makeText(getContext(), R.string.error_empty_strings, Toast.LENGTH_LONG).show();
             return false;
         }
