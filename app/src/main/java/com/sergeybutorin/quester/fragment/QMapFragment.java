@@ -196,10 +196,6 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback,
 
         getLocationPermission();
 
-        updateLocationUI();
-
-        getDeviceLocation();
-
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng point) {
@@ -265,6 +261,7 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback,
                         }
                     }
                 });
+                updateLocationUI();
             }
         } catch (SecurityException e)  {
             Log.e("Exception: %s", e.getMessage());
@@ -284,9 +281,9 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback,
                 android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             mLocationPermissionGranted = true;
+            getDeviceLocation();
         } else {
-            ActivityCompat.requestPermissions(getActivity(),
-                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+            requestPermissions(new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
                     PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
         }
     }
@@ -308,7 +305,7 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback,
                 }
             }
         }
-        updateLocationUI();
+        getDeviceLocation();
     }
 
     @Override

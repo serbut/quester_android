@@ -5,4 +5,5 @@ package com.sergeybutorin.quester.utils;
  */
 
 public class QuestUpdateTask {
+    // TODO
 }
