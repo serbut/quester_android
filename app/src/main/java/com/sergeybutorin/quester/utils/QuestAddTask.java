@@ -34,6 +34,7 @@ public class QuestAddTask extends AsyncTask<Quest, Void, Void> {
 
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues questValues = new ContentValues();
+        questValues.put(QuesterDbHelper.QuestEntry._ID, quests[0].getId());
         questValues.put(QuesterDbHelper.QuestEntry.COLUMN_NAME_TITLE, quests[0].getTitle());
         questValues.put(QuesterDbHelper.QuestEntry.COLUMN_NAME_USER, email);
         long newRowId = db.insert(QuesterDbHelper.QuestEntry.TABLE_NAME, null, questValues);

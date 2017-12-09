@@ -46,6 +46,7 @@ public class GetQuestListTask extends AsyncTask<Void, Void, List<QuestBase>> {
             quests.add(new QuestBase(id, version));
         }
         cursor.close();
+        if (isCancelled()) return null;
         return quests;
     }
 

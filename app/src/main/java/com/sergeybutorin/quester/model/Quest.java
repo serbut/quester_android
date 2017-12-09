@@ -6,19 +6,29 @@ import com.google.android.gms.maps.model.Marker;
 import java.util.LinkedList;
 
 public class Quest extends QuestBase {
-    private String title = "unknownQuestName";
-    private String description = "unknownQuestDescription";
+    private String title = "Очень классный маршрут";
+    private String description = "Это очень классный маршрут! Советую посетить всем!";
     private LinkedList<LatLng> points = new LinkedList<>();
     private final LinkedList<Marker> markers = new LinkedList<>();
 
     public Quest() {
     }
 
+    public Quest(int id,
+                 int version,
+                 String title,
+                 String description) {
+        super(id, version);
+        this.title = title;
+        this.description = description;
+    }
+
     public Quest(String title,
+                 String description,
                  LinkedList<LatLng> points) {
         this.title = title;
+        this.description = description;
         this.points = points;
-        this.description = "Loaded from DB";
     }
 
     public String getTitle() {
@@ -40,6 +50,11 @@ public class Quest extends QuestBase {
     public void addPoint(LatLng point) {
         points.add(point);
     }
+
+    public void setPoints(LinkedList<LatLng> points) {
+        this.points = points;
+    }
+
 
     public LinkedList<LatLng> getPoints() {
         return points;

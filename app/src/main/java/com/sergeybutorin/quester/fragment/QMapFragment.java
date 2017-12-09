@@ -75,6 +75,7 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback,
 
     private QuesterDbHelper dbHelper;
     private QuestsGetTask questsGetTask;
+    private GetQuestListTask getQuestListTask;
 
     private QuestController controller;
 
@@ -156,7 +157,7 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback,
 
         dbHelper = QuesterDbHelper.getInstance(getContext());
 
-        GetQuestListTask getQuestListTask = new GetQuestListTask(dbHelper, this);
+        getQuestListTask = new GetQuestListTask(dbHelper, this);
         getQuestListTask.execute();
 
         controller = QuestController.getInstance();
@@ -227,6 +228,7 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback,
         super.onStop();
         if (questsGetTask != null) {
             questsGetTask.cancel(false);
+            getQuestListTask.cancel(false);
         }
     }
 
@@ -308,12 +310,6 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback,
         getDeviceLocation();
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        dbHelper.close();
-    }
-
     private void updateLocationUI() {
         if (mMap == null) {
             return;
@@ -393,21 +389,25 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback,
 
     @Override
     public void onAddResult(boolean success, int message, Quest quest) {
-        if (!success) {
-            Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
-        } else if (quest != null) {
-            QuestAddTask questAddTask = new QuestAddTask(dbHelper, QMapFragment.this);
-            questAddTask.execute(quest);
-            quests.add(quest);
+        if (mMap != null) {
+            if (!success) {
+                Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
+            } else if (quest != null) {
+                QuestAddTask questAddTask = new QuestAddTask(dbHelper, QMapFragment.this);
+                questAddTask.execute(quest);
+                quests.add(quest);
+            }
         }
     }
 
     @Override
     public void onGetResult(boolean success, int message, Quest quest) {
-        if (!success) {
-            Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
-        } else if (quest != null) {
-            quests.add(quest);
+        if (mMap != null) {
+            if (!success) {
+                Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
+            } else if (quest != null) {
+                addQuest(quest);
+            }
         }
     }
 

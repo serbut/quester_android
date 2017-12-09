@@ -7,9 +7,6 @@ import com.sergeybutorin.quester.Constants;
 import com.sergeybutorin.quester.R;
 import com.sergeybutorin.quester.model.Quest;
 import com.sergeybutorin.quester.model.QuestBase;
-import com.sergeybutorin.quester.utils.GetQuestListTask;
-import com.sergeybutorin.quester.utils.QuesterDbHelper;
-import com.sergeybutorin.quester.utils.QuestsGetTask;
 
 import java.util.List;
 
@@ -28,8 +25,8 @@ public class QuestController {
 
     private static QuestController instance;
     private final Api api;
-    private AddQuestListener addQuestResult;
-    private GetQuestListener getQuestResult;
+    private AddQuestListener addQuestListener;
+    private GetQuestListener getQuestListener;
 
     private QuestController() {
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
@@ -53,28 +50,30 @@ public class QuestController {
     }
 
     public void setAddQuestListener(AddQuestListener listener) {
-        addQuestResult = listener;
+        addQuestListener = listener;
     }
 
     public void setGetQuestListener(GetQuestListener listener) {
-        getQuestResult = listener;
+        getQuestListener = listener;
     }
 
     public void add(Quest quest, String token) {
-        api.newQuest(token, new Quest(quest.getTitle(), quest.getPoints())).enqueue(new Callback<Quest>() {
+        api.newQuest(token, new Quest(quest.getTitle(),
+                quest.getDescription(),
+                quest.getPoints())).enqueue(new Callback<Quest>() {
             @Override
             public void onResponse(@NonNull Call<Quest> call, @NonNull Response<Quest> response) {
                 final boolean isSuccess = response.code() == 200;
                 if (isSuccess) {
-                    addQuestResult.onAddResult(true, R.string.quest_server_ok, response.body());
+                    addQuestListener.onAddResult(true, R.string.quest_server_ok, response.body());
                 } else {
-                    addQuestResult.onAddResult(false, R.string.error_message, null);
+                    addQuestListener.onAddResult(false, R.string.error_message, null);
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<Quest> call, @NonNull Throwable t) {
-                addQuestResult.onAddResult(false, R.string.error_network_message, null);
+                addQuestListener.onAddResult(false, R.string.error_network_message, null);
             }
         });
     }
@@ -86,7 +85,6 @@ public class QuestController {
                 final boolean isSuccess = response.code() == 200;
                 if (isSuccess) {
                     for (QuestBase quest : response.body()) {
-                        Log.d("QUEST", "id = " + quest.getId() + " version = " + quest.getVersion());
                         int id = quest.getId();
                         if (!savedQuests.contains(id)) {
                             getDetails(id);
@@ -96,8 +94,8 @@ public class QuestController {
             }
 
             @Override
-            public void onFailure(Call<List<QuestBase>> call, Throwable t) {
-                addQuestResult.onAddResult(false, R.string.error_network_message, null);
+            public void onFailure(@NonNull Call<List<QuestBase>> call, @NonNull Throwable t) {
+                addQuestListener.onAddResult(false, R.string.error_network_message, null);
             }
         });
     }
@@ -108,15 +106,16 @@ public class QuestController {
             public void onResponse(@NonNull Call<Quest> call, @NonNull Response<Quest> response) {
                 final boolean isSuccess = response.code() == 200;
                 if (isSuccess) {
-                    getQuestResult.onGetResult(true, R.string.quest_received, response.body());
+                    getQuestListener.onGetResult(true, R.string.quest_received, response.body());
                 } else {
-                    addQuestResult.onAddResult(false, R.string.error_message, null);
+                    getQuestListener.onGetResult(false, R.string.error_message, null);
                 }
+
             }
 
             @Override
-            public void onFailure(Call<Quest> call, Throwable t) {
-                getQuestResult.onGetResult(false, R.string.error_network_message, null);
+            public void onFailure(@NonNull Call<Quest> call, @NonNull Throwable t) {
+                getQuestListener.onGetResult(false, R.string.error_network_message, null);
             }
         });
     }
