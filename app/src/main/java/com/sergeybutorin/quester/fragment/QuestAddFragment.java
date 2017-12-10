@@ -14,6 +14,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.sergeybutorin.quester.R;
+import com.sergeybutorin.quester.activity.MainActivity;
 import com.sergeybutorin.quester.model.Quest;
 import com.sergeybutorin.quester.network.QuestController;
 import com.sergeybutorin.quester.utils.SPHelper;
@@ -67,6 +68,8 @@ public class QuestAddFragment extends Fragment implements QuestController.AddQue
     @OnClick(R.id.button_quest_create_done)
     void onDoneButtonClick() {
         // TODO: Add progress bar
+        ((MainActivity)getActivity()).hideSoftKeyboard();
+
         String title = titleEditText.getText().toString();
         String description = descriptionEditText.getText().toString();
         if (TextUtils.isEmpty(title) || TextUtils.isEmpty(description)) {
@@ -87,6 +90,7 @@ public class QuestAddFragment extends Fragment implements QuestController.AddQue
 
     @OnClick(R.id.button_quest_create_cancel)
     void onCancelButtonClick() {
+        ((MainActivity)getActivity()).hideSoftKeyboard();
         questSavedListener.onQuestSaved(null);
     }
 

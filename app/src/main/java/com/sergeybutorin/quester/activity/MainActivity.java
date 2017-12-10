@@ -12,6 +12,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 
 import com.sergeybutorin.quester.R;
@@ -150,5 +151,13 @@ public class MainActivity extends AppCompatActivity
         qMapFragment.setArguments(args);
         getSupportFragmentManager()
                 .beginTransaction().replace(R.id.content, qMapFragment).commit();
+    }
+
+    public void hideSoftKeyboard() {
+        View view = getCurrentFocus();
+        if(view != null) {
+            InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
     }
 }

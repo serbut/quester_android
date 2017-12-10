@@ -8,6 +8,7 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -22,6 +23,8 @@ import com.sergeybutorin.quester.utils.SPHelper;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+
+import static android.content.Context.INPUT_METHOD_SERVICE;
 
 /**
  * Created by sergeybutorin on 03/11/2017.
@@ -64,6 +67,7 @@ public class AuthFragment extends Fragment
 
     @OnClick(R.id.button_login)
     void onLoginButtonClick() {
+        ((MainActivity)getActivity()).hideSoftKeyboard();
         if (checkLoginFields()) {
             controller.login(emailEditText.getText().toString(),
                     passwordEditText.getText().toString());
@@ -72,6 +76,7 @@ public class AuthFragment extends Fragment
 
     @OnClick(R.id.button_signup)
     void onSignupButtonClick() {
+        ((MainActivity)getActivity()).hideSoftKeyboard();
         if (!signupMode) {
             controller.setLoginResultListener(null);
             showSignupFields();
