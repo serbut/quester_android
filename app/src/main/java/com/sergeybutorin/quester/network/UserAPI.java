@@ -18,19 +18,10 @@ import retrofit2.http.Path;
  * Created by sergeybutorin on 05/11/2017.
  */
 
-interface Api {
+interface UserAPI {
     @POST("user/login")
     Call<UserProfile> login(@Body LoginRequest request);
 
     @POST("user/signup")
     Call<UserProfile> signup(@Body SignupRequest request);
-
-    @POST("quest/new")
-    Call<Quest> newQuest(@Header("User-Token") String userToken, @Body Quest quest);
-
-    @POST("quest/get_all")
-    Call<List<QuestBase>> getAllQuests();
-
-    @POST("quest/{id}/details")
-    Call<Quest> getQuestDetails(@Path("id") int questId);
 }

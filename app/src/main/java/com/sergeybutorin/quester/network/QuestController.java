@@ -1,7 +1,6 @@
 package com.sergeybutorin.quester.network;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.sergeybutorin.quester.Constants;
 import com.sergeybutorin.quester.R;
@@ -26,7 +25,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class QuestController {
 
     private static QuestController instance;
-    private final Api api;
+    private final QuestAPI api;
     private AddQuestListener addQuestListener;
     private GetQuestListener getQuestListener;
 
@@ -41,7 +40,7 @@ public class QuestController {
                         );
 
         Retrofit retrofit = builder.client(httpClient.build()).build();
-        api = retrofit.create(Api.class);
+        api = retrofit.create(QuestAPI.class);
     }
 
     public static synchronized QuestController getInstance() {

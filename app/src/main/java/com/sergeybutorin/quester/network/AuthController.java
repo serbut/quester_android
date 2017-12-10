@@ -1,8 +1,5 @@
 package com.sergeybutorin.quester.network;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 
 import com.sergeybutorin.quester.Constants;
@@ -10,7 +7,6 @@ import com.sergeybutorin.quester.R;
 import com.sergeybutorin.quester.model.LoginRequest;
 import com.sergeybutorin.quester.model.SignupRequest;
 import com.sergeybutorin.quester.model.UserProfile;
-import com.sergeybutorin.quester.utils.SPHelper;
 
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
@@ -25,7 +21,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class AuthController {
     private static AuthController instance;
-    private final Api api;
+    private final UserAPI userAPI;
     private LoginListener loginResult;
     private SignupListener signupResult;
 
@@ -40,7 +36,7 @@ public class AuthController {
                         );
 
         Retrofit retrofit = builder.client(httpClient.build()).build();
-        api = retrofit.create(Api.class);
+        userAPI = retrofit.create(UserAPI.class);
     }
 
     public static synchronized AuthController getInstance() {
@@ -59,7 +55,7 @@ public class AuthController {
     }
 
     public void login(String email, String password) {
-        api.login(new LoginRequest(email, password)).enqueue(new Callback<UserProfile>() {
+        userAPI.login(new LoginRequest(email, password)).enqueue(new Callback<UserProfile>() {
             @Override
             public void onResponse(@NonNull Call<UserProfile> call, @NonNull Response<UserProfile> response) {
                 final boolean isSuccess = response.code() == 200;
@@ -92,7 +88,7 @@ public class AuthController {
     }
 
     public void signup(String email, String password, String firstName, String lastName) {
-        api.signup(new SignupRequest(email, password, firstName, lastName)).enqueue(new Callback<UserProfile>() {
+        userAPI.signup(new SignupRequest(email, password, firstName, lastName)).enqueue(new Callback<UserProfile>() {
             @Override
             public void onResponse(@NonNull Call<UserProfile> call, @NonNull Response<UserProfile> response) {
                 final boolean isSuccess = response.code() == 200;

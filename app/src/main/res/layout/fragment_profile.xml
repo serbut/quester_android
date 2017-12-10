@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_margin="50dp"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@color/colorAccent">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -13,9 +14,9 @@
         android:gravity="center_vertical">
 
         <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:id="@+id/avatar_profile"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             app:srcCompat="@drawable/ic_profile_default" />
 
         <LinearLayout
@@ -34,8 +35,7 @@
                 android:id="@+id/button_add_avatar_gallery"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/button_add_photo_gallery"
-                android:layout_marginTop="15dp" />
+                android:text="@string/button_add_photo_gallery" />
         </LinearLayout>
     </LinearLayout>
 
