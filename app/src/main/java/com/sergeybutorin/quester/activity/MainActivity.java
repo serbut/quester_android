@@ -28,6 +28,7 @@ public class MainActivity extends AppCompatActivity
         QMapFragment.QuestAddListener,
         QuestAddFragment.QuestSavedListener {
 
+
     private TextView nameTextView;
     private TextView emailTextView;
     private NavigationView navigationView;

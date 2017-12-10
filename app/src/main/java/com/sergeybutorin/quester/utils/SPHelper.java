@@ -62,7 +62,7 @@ public class SPHelper {
         editor.apply();
     }
 
-    private boolean isUserSet() {
+    public boolean isUserSet() {
         for (USER_KEYS key : USER_KEYS.values()) {
             if (!sp.contains(key.getValue())) {
                 return false;

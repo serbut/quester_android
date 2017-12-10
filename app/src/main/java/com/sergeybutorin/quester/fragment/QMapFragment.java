@@ -40,6 +40,10 @@ import com.sergeybutorin.quester.utils.SPHelper;
 import java.util.LinkedList;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
 /**
  * Created by sergeybutorin on 29/10/2017.
  */
@@ -47,6 +51,7 @@ import java.util.List;
 public class QMapFragment extends Fragment implements OnMapReadyCallback,
         QuestController.AddQuestListener,
         QuestController.GetQuestListener {
+
     public static final String TAG = QMapFragment.class.getSimpleName();
     public static final String QUEST_ARG = "QUEST_ARG";
 
@@ -55,10 +60,7 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback,
     private GoogleMap mMap;
 
     private boolean mLocationPermissionGranted;
-    // The entry point to the Fused Location Provider.
     private FusedLocationProviderClient mFusedLocationProviderClient;
-    // The geographical location where the device is currently located. That is, the last-known
-    // location retrieved by the Fused Location Provider.
     private Location mLastKnownLocation;
 
     private static final int DEFAULT_ZOOM = 15;
@@ -70,12 +72,19 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback,
     private QUESTS_STATE state = QUESTS_STATE.DISPLAY;
     private final LinkedList<Quest> quests = new LinkedList<>();
     private final java.util.HashMap<Marker, Quest> mapper = new java.util.HashMap<>();
+
     private Quest questToAdd = new Quest();
     private Quest addedQuest;
-    private FloatingActionButton fabAdd;
-    private FloatingActionButton fabDone;
-    private FloatingActionButton fabClear;
-    private FloatingActionButton fabBack;
+    private boolean isLoggedIn = false;
+
+    @BindView(R.id.fab_add)
+    FloatingActionButton fabAdd;
+    @BindView(R.id.fab_done)
+    FloatingActionButton fabDone;
+    @BindView(R.id.fab_clear)
+    FloatingActionButton fabClear;
+    @BindView(R.id.fab_back)
+    FloatingActionButton fabBack;
 
     private QuesterDbHelper dbHelper;
     private QuestsGetTask questsGetTask;
@@ -97,75 +106,16 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback,
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        ButterKnife.bind(this, view);
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+        isLoggedIn = SPHelper.getInstance(getContext()).isUserSet();
 
         questAddListener = (QuestAddListener) getActivity();
 
-        // Construct a FusedLocationProviderClient.
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getContext());
 
         final SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
-        fabAdd = view.findViewById(R.id.fab_add);
-        fabDone = view.findViewById(R.id.fab_done);
-        fabClear = view.findViewById(R.id.fab_clear);
-        fabBack = view.findViewById(R.id.fab_back);
-
-        fabAdd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                state = QUESTS_STATE.ADD;
-                mMap.clear();
-                switchState();
-            }
-        });
-
-        fabDone.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (questToAdd.getPoints().size() < 1) {
-                    Toast.makeText(getContext(), R.string.error_no_points_quests, Toast.LENGTH_SHORT).show();
-                } else {
-                    state = QUESTS_STATE.DISPLAY;
-
-                    Log.d(TAG, "Save" + questToAdd.getPoints().size());
-
-                    String token = SPHelper.getInstance(getContext()).getUserToken();
-
-                    if (token == null) {
-                        Toast.makeText(getContext(), R.string.error_no_authorized_quest, Toast.LENGTH_LONG).show();
-                    } else {
-                        questAddListener.onPointsAdded(questToAdd);
-
-//                        controller.add(questToAdd, token);
-//
-//                        questToAdd = new Quest();
-//                        switchState();
-//                        showQuests();
-                    }
-                }
-            }
-        });
-
-        fabClear.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                state = QUESTS_STATE.DISPLAY;
-                for(Marker marker : questToAdd.getMarkers()) {
-                    marker.remove();
-                }
-                questToAdd.clear();
-                switchState();
-            }
-        });
-
-        fabBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showQuests();
-            }
-        });
 
         switchState();
 
@@ -364,10 +314,53 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback,
         }
     }
 
+    @OnClick(R.id.fab_add)
+    void onAddButtonClick() {
+        state = QUESTS_STATE.ADD;
+        mMap.clear();
+        switchState();
+    }
+
+    @OnClick(R.id.fab_done)
+    void onDoneButtonClick() {
+        if (questToAdd.getPoints().size() < 1) {
+            Toast.makeText(getContext(), R.string.error_no_points_quests, Toast.LENGTH_SHORT).show();
+        } else {
+            state = QUESTS_STATE.DISPLAY;
+
+            String token = SPHelper.getInstance(getContext()).getUserToken();
+
+            if (token == null) {
+                Toast.makeText(getContext(), R.string.error_no_authorized_quest, Toast.LENGTH_LONG).show();
+            } else {
+                questAddListener.onPointsAdded(questToAdd);
+            }
+        }
+    }
+
+    @OnClick(R.id.fab_clear)
+    void onClearButtonClick() {
+        state = QUESTS_STATE.DISPLAY;
+        for(Marker marker : questToAdd.getMarkers()) {
+            marker.remove();
+        }
+        questToAdd.clear();
+        switchState();
+    }
+
+    @OnClick(R.id.fab_back)
+    void onBackButtonClick() {
+        showQuests();
+    }
+
     private void switchState() {
         switch (state) {
             case DISPLAY:
-                fabAdd.show();
+                if (isLoggedIn) {
+                    fabAdd.show();
+                } else {
+                    fabAdd.hide();
+                }
                 fabDone.hide();
                 fabClear.hide();
                 break;
