@@ -3,10 +3,10 @@
     <string name="email_hint">Email</string>
     <string name="password_hint">Пароль</string>
     <string name="login_button_text">Войти</string>
-    <string name="my_places">Мои места</string>
-    <string name="settings">Настройки</string>
-    <string name="favourites">Избранное</string>
-    <string name="map">Карта</string>
+    <string name="nav_my_places">Мои места</string>
+    <string name="nav_profile">Профиль</string>
+    <string name="nav_favourites">Избранное</string>
+    <string name="nav_map">Карта</string>
     <string name="signup_button_text">Зарегистрироваться</string>
     <string name="firstname_hint">Введите имя</string>
     <string name="lastname_hint">Введите фамилию</string>
@@ -20,7 +20,7 @@
     <string name="auth_text">Авторизация</string>
     <string name="auth_ok">Вы авторизованы</string>
     <string name="guest_name">Гость</string>
-    <string name="nav_logout">Выйти</string>
+    <string name="logout_button_text">Выйти</string>
     <string name="quest_add_btn">Добавить квест</string>
     <string name="error_no_points_quests">Вы должны добавить точки в квест</string>
     <string name="error_no_authorized_quest">Вы должны авторизованы, чтобы добавлять квесты</string>
@@ -29,4 +29,6 @@
     <string name="quest_description_hint">Описание квеста</string>
     <string name="button_quest_create_cancel">Отменить</string>
     <string name="button_quest_create_done">Готово</string>
+    <string name="button_add_photo_camera">Сделать фото</string>
+    <string name="button_add_photo_gallery">Выбрать из галереи</string>
 </resources>

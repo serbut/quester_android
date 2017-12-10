@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import com.sergeybutorin.quester.R;
 import com.sergeybutorin.quester.fragment.AuthFragment;
+import com.sergeybutorin.quester.fragment.ProfileFragment;
 import com.sergeybutorin.quester.fragment.QMapFragment;
 import com.sergeybutorin.quester.fragment.QuestAddFragment;
 import com.sergeybutorin.quester.model.Quest;
@@ -28,13 +29,12 @@ public class MainActivity extends AppCompatActivity
         QMapFragment.QuestAddListener,
         QuestAddFragment.QuestSavedListener {
 
-
     private TextView nameTextView;
     private TextView emailTextView;
     private NavigationView navigationView;
     private Menu menu;
     private MenuItem loginItem;
-    private MenuItem logoutItem;
+    private MenuItem profileItem;
     private SPHelper spHelper;
 
     @Override
@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity
         emailTextView = headerView.findViewById(R.id.user_email);
         menu = navigationView.getMenu();
         loginItem = menu.findItem(R.id.nav_login);
-        logoutItem = menu.findItem(R.id.nav_logout);
+        profileItem = menu.findItem(R.id.nav_profile);
 
         spHelper = SPHelper.getInstance(getApplicationContext());
 
@@ -103,9 +103,8 @@ public class MainActivity extends AppCompatActivity
             case R.id.nav_map:
                 getSupportFragmentManager().beginTransaction().replace(R.id.content, new QMapFragment()).commit();
                 break;
-            case R.id.nav_logout:
-                spHelper.removeUserData();
-                setUserInformation();
+            case R.id.nav_profile:
+                getSupportFragmentManager().beginTransaction().replace(R.id.content, new ProfileFragment()).commit();
                 break;
         }
 
@@ -124,14 +123,14 @@ public class MainActivity extends AppCompatActivity
             emailTextView.setText(user.getEmail());
 
             loginItem.setVisible(false);
-            logoutItem.setVisible(true);
+            profileItem.setVisible(true);
         } else {
             nameTextView.setText(R.string.guest_name);
 
             emailTextView.setVisibility(View.GONE);
 
             loginItem.setVisible(true);
-            logoutItem.setVisible(false);
+            profileItem.setVisible(false);
         }
     }
 
