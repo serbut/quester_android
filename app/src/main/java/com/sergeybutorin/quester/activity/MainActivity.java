@@ -31,8 +31,6 @@ public class MainActivity extends AppCompatActivity
 
     private TextView nameTextView;
     private TextView emailTextView;
-    private NavigationView navigationView;
-    private Menu menu;
     private MenuItem loginItem;
     private MenuItem profileItem;
     private SPHelper spHelper;
@@ -65,12 +63,12 @@ public class MainActivity extends AppCompatActivity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        navigationView = findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         View headerView = navigationView.getHeaderView(0);
         nameTextView = headerView.findViewById(R.id.user_name);
         emailTextView = headerView.findViewById(R.id.user_email);
-        menu = navigationView.getMenu();
+        Menu menu = navigationView.getMenu();
         loginItem = menu.findItem(R.id.nav_login);
         profileItem = menu.findItem(R.id.nav_profile);
 

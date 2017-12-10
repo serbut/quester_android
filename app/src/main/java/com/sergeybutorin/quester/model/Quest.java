@@ -56,7 +56,6 @@ public class Quest extends QuestBase implements Serializable {
         this.points = points;
     }
 
-
     public LinkedList<LatLng> getPoints() {
         return points;
     }

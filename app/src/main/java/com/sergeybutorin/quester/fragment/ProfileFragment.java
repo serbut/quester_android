@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import com.sergeybutorin.quester.R;
 import com.sergeybutorin.quester.activity.MainActivity;
 import com.sergeybutorin.quester.utils.SPHelper;
+import com.squareup.picasso.Picasso;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -26,6 +27,9 @@ import static android.app.Activity.RESULT_OK;
  */
 
 public class ProfileFragment extends Fragment {
+
+    private final int CAMERA_REQUEST_CODE = 0;
+    private final int GALLERY_REQUEST_CODE = 1;
 
     @BindView(R.id.avatar_profile)
     ImageView avatar;
@@ -50,31 +54,30 @@ public class ProfileFragment extends Fragment {
     @OnClick(R.id.button_add_avatar_camera)
     void onCameraClick() {
         Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        startActivityForResult(takePicture, 0);//zero can be replaced with any action code
+        startActivityForResult(takePicture, CAMERA_REQUEST_CODE);//zero can be replaced with any action code
     }
 
     @OnClick(R.id.button_add_avatar_gallery)
     void onGalleryClick() {
         Intent pickPhoto = new Intent(Intent.ACTION_PICK,
                 android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        startActivityForResult(pickPhoto , 1);//one can be replaced with any action code
+        startActivityForResult(pickPhoto , GALLERY_REQUEST_CODE);//one can be replaced with any action code
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
         super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
         switch(requestCode) {
-            case 0:
+            case CAMERA_REQUEST_CODE:
+            case GALLERY_REQUEST_CODE:
                 if(resultCode == RESULT_OK){
                     Uri selectedImage = imageReturnedIntent.getData();
-                    avatar.setImageURI(selectedImage);
+                    Picasso.with(getContext())
+                            .load(selectedImage)
+                            .resize(500, 500)
+                            .centerCrop()
+                            .into(avatar);
                 }
 
-                break;
-            case 1:
-                if(resultCode == RESULT_OK){
-                    Uri selectedImage = imageReturnedIntent.getData();
-                    avatar.setImageURI(selectedImage);
-                }
                 break;
         }
     }
