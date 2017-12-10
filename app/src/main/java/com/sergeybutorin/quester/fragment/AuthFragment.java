@@ -21,22 +21,30 @@ import com.sergeybutorin.quester.model.UserProfile;
 import com.sergeybutorin.quester.network.AuthController;
 import com.sergeybutorin.quester.utils.SPHelper;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
 /**
  * Created by sergeybutorin on 03/11/2017.
  */
 
-public class AuthFragment extends Fragment implements View.OnClickListener,
-        AuthController.LoginListener,
+public class AuthFragment extends Fragment
+        implements AuthController.LoginListener,
         AuthController.SignupListener {
 
     private boolean signupMode = false;
 
-    private Button loginButton;
-    private Button signupButton;
-    private EditText emailEditText;
-    private EditText passwordEditText;
-    private EditText firstnameEditText;
-    private EditText lastnameEditText;
+    @BindView(R.id.button_login)
+    Button loginButton;
+    @BindView(R.id.email_edit_text)
+    EditText emailEditText;
+    @BindView(R.id.password_edit_text)
+    EditText passwordEditText;
+    @BindView(R.id.firstname_edit_text)
+    EditText firstnameEditText;
+    @BindView(R.id.lastname_edit_text)
+    EditText lastnameEditText;
 
     private AuthController controller;
 
@@ -45,46 +53,35 @@ public class AuthFragment extends Fragment implements View.OnClickListener,
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_login, container, false);
 
+        ButterKnife.bind(this, view);
+
         controller = AuthController.getInstance();
         controller.setLoginResultListener(this);
         controller.setSignupResultListener(this);
-
-        loginButton = view.findViewById(R.id.button_login);
-        signupButton = view.findViewById(R.id.button_signup);
-
-        emailEditText = view.findViewById(R.id.email_edit_text);
-        passwordEditText = view.findViewById(R.id.password_edit_text);
-        firstnameEditText = view.findViewById(R.id.firstname_edit_text);
-        lastnameEditText = view.findViewById(R.id.lastname_edit_text);
-
-        loginButton.setOnClickListener(this);
-        signupButton.setOnClickListener(this);
 
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         return view;
     }
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.button_login:
-                if (checkLoginFields()) {
-                    controller.login(emailEditText.getText().toString(),
-                            passwordEditText.getText().toString());
-                }
-                break;
-            case R.id.button_signup:
-                if (!signupMode) {
-                    controller.setLoginResultListener(null);
-                    showSignupFields();
-                } else if (checkSignupFields()) {
-                    controller.signup(emailEditText.getText().toString(),
-                            passwordEditText.getText().toString(),
-                            firstnameEditText.getText().toString(),
-                            lastnameEditText.getText().toString());
-                }
-                break;
+    @OnClick(R.id.button_login)
+    void onLoginButtonClick() {
+        if (checkLoginFields()) {
+            controller.login(emailEditText.getText().toString(),
+                    passwordEditText.getText().toString());
+        }
+    }
+
+    @OnClick(R.id.button_signup)
+    void onSignupButtonClick() {
+        if (!signupMode) {
+            controller.setLoginResultListener(null);
+            showSignupFields();
+        } else if (checkSignupFields()) {
+            controller.signup(emailEditText.getText().toString(),
+                    passwordEditText.getText().toString(),
+                    firstnameEditText.getText().toString(),
+                    lastnameEditText.getText().toString());
         }
     }
 

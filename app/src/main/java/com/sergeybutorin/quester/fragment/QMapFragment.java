@@ -180,7 +180,7 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback,
 
         Bundle bundle = this.getArguments();
         if (bundle != null) {
-            Quest addedQuest = (Quest) bundle.getSerializable(QUEST_ARG);
+            addedQuest = (Quest) bundle.getSerializable(QUEST_ARG);
         }
     }
 
@@ -259,6 +259,13 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback,
             questsGetTask.cancel(false);
             getQuestListTask.cancel(false);
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        controller.setGetQuestListener(null);
+        controller.setAddQuestListener(null);
     }
 
     /**

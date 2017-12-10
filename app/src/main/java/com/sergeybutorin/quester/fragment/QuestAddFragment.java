@@ -79,6 +79,12 @@ public class QuestAddFragment extends Fragment implements QuestController.AddQue
         controller.add(quest, token);
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        controller.setAddQuestListener(null);
+    }
+
     @OnClick(R.id.button_quest_create_cancel)
     void onCancelButtonClick() {
         questSavedListener.onQuestSaved(null);
