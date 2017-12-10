@@ -30,7 +30,7 @@ public class QuestAddTask extends AsyncTask<Quest, Void, Void> {
         ContentValues questValues = new ContentValues();
         questValues.put(QuesterDbHelper.QuestEntry._ID, quests[0].getId());
         questValues.put(QuesterDbHelper.QuestEntry.COLUMN_NAME_TITLE, quests[0].getTitle());
-        questValues.put(QuesterDbHelper.QuestEntry.COLUMN_NAME_USER, "todo"); // TODO
+        questValues.put(QuesterDbHelper.QuestEntry.COLUMN_NAME_USER, "todo"); // TODO: get real email
         long newRowId = db.insert(QuesterDbHelper.QuestEntry.TABLE_NAME, null, questValues);
         int order = 0;
         for (LatLng point : quests[0].getPoints()) {

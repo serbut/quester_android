@@ -17,11 +17,16 @@ import android.widget.TextView;
 import com.sergeybutorin.quester.R;
 import com.sergeybutorin.quester.fragment.AuthFragment;
 import com.sergeybutorin.quester.fragment.QMapFragment;
+import com.sergeybutorin.quester.fragment.QuestAddFragment;
+import com.sergeybutorin.quester.model.Quest;
 import com.sergeybutorin.quester.model.UserProfile;
 import com.sergeybutorin.quester.utils.SPHelper;
 
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener,
+        QMapFragment.QuestAddListener,
+        QuestAddFragment.QuestSavedListener {
 
     private TextView nameTextView;
     private TextView emailTextView;
@@ -127,5 +132,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             loginItem.setVisible(true);
             logoutItem.setVisible(false);
         }
+    }
+
+    @Override
+    public void onPointsAdded(Quest quest) {
+        QuestAddFragment questAddFragment = new QuestAddFragment();
+        Bundle args = new Bundle();
+        args.putSerializable(QuestAddFragment.QUEST_ARG, quest);
+        questAddFragment.setArguments(args);
+        getSupportFragmentManager()
+                .beginTransaction().replace(R.id.content, questAddFragment).commit();
+    }
+
+    @Override
+    public void onQuestSaved(Quest quest) {
+        QMapFragment qMapFragment = new QMapFragment();
+        Bundle args = new Bundle();
+        args.putSerializable(QMapFragment.QUEST_ARG, quest);
+        qMapFragment.setArguments(args);
+        getSupportFragmentManager()
+                .beginTransaction().replace(R.id.content, qMapFragment).commit();
     }
 }

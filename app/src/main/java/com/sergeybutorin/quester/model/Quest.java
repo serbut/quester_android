@@ -3,9 +3,10 @@ package com.sergeybutorin.quester.model;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
+import java.io.Serializable;
 import java.util.LinkedList;
 
-public class Quest extends QuestBase {
+public class Quest extends QuestBase implements Serializable {
     private String title = "Очень классный маршрут";
     private String description = "Это очень классный маршрут! Советую посетить всем!";
     private LinkedList<LatLng> points = new LinkedList<>();

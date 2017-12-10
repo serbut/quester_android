@@ -1,10 +1,12 @@
 package com.sergeybutorin.quester.model;
 
+import java.io.Serializable;
+
 /**
  * Created by sergeybutorin on 09/12/2017.
  */
 
-public class QuestBase {
+public class QuestBase implements Serializable {
     private int id;
     private int version;
 

@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
@@ -49,6 +48,9 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback,
         QuestController.AddQuestListener,
         QuestController.GetQuestListener {
     public static final String TAG = QMapFragment.class.getSimpleName();
+    public static final String QUEST_ARG = "QUEST_ARG";
+
+    QuestAddListener questAddListener;
 
     private GoogleMap mMap;
 
@@ -69,6 +71,7 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback,
     private final LinkedList<Quest> quests = new LinkedList<>();
     private final java.util.HashMap<Marker, Quest> mapper = new java.util.HashMap<>();
     private Quest questToAdd = new Quest();
+    private Quest addedQuest;
     private FloatingActionButton fabAdd;
     private FloatingActionButton fabDone;
     private FloatingActionButton fabClear;
@@ -80,6 +83,9 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback,
 
     private QuestController controller;
 
+    public interface QuestAddListener {
+        void onPointsAdded(Quest quest);
+    }
 
     @Nullable
     @Override
@@ -92,6 +98,8 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback,
         super.onViewCreated(view, savedInstanceState);
 
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+
+        questAddListener = (QuestAddListener) getActivity();
 
         // Construct a FusedLocationProviderClient.
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getContext());
@@ -127,11 +135,13 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback,
                     if (token == null) {
                         Toast.makeText(getContext(), R.string.error_no_authorized_quest, Toast.LENGTH_LONG).show();
                     } else {
-                        controller.add(questToAdd, token);
+                        questAddListener.onPointsAdded(questToAdd);
 
-                        questToAdd = new Quest();
-                        switchState();
-                        showQuests();
+//                        controller.add(questToAdd, token);
+//
+//                        questToAdd = new Quest();
+//                        switchState();
+//                        showQuests();
                     }
                 }
             }
@@ -166,6 +176,11 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback,
         controller = QuestController.getInstance();
         controller.setAddQuestListener(this);
         controller.setGetQuestListener(this);
+
+        Bundle bundle = this.getArguments();
+        if (bundle != null) {
+            Quest addedQuest = (Quest) bundle.getSerializable(QUEST_ARG);
+        }
     }
 
     /**
@@ -224,6 +239,11 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback,
 
         questsGetTask = new QuestsGetTask(dbHelper, this);
         questsGetTask.execute();
+
+        if (addedQuest != null) {
+            saveQuest(addedQuest);
+            // TODO: Go to new quest position
+        }
     }
 
     @Override
@@ -390,15 +410,19 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback,
         showQuest(quest);
     }
 
+    private void saveQuest(Quest quest) {
+        QuestAddTask questAddTask = new QuestAddTask(dbHelper, QMapFragment.this);
+        questAddTask.execute(quest);
+        addQuest(quest);
+    }
+
     @Override
     public void onAddResult(boolean success, int message, Quest quest) {
         if (mMap != null) {
             if (!success) {
                 Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
             } else if (quest != null) {
-                QuestAddTask questAddTask = new QuestAddTask(dbHelper, QMapFragment.this);
-                questAddTask.execute(quest);
-                addQuest(quest);
+                saveQuest(quest);
             }
         }
     }
@@ -406,9 +430,7 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback,
     @Override
     public void onGetResult(boolean success, Quest quest) {
         if (mMap != null && quest != null) {
-            QuestAddTask questAddTask = new QuestAddTask(dbHelper, QMapFragment.this);
-            questAddTask.execute(quest);
-            addQuest(quest);
+            saveQuest(quest);
         }
     }
 

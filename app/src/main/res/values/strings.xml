@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Quester</string>
-    <string name="email_hint">Введите email</string>
-    <string name="password_hint">Введите пароль</string>
+    <string name="email_hint">Email</string>
+    <string name="password_hint">Пароль</string>
     <string name="login_button_text">Войти</string>
     <string name="my_places">Мои места</string>
     <string name="settings">Настройки</string>
@@ -25,6 +25,8 @@
     <string name="error_no_points_quests">Вы должны добавить точки в квест</string>
     <string name="error_no_authorized_quest">Вы должны авторизованы, чтобы добавлять квесты</string>
     <string name="quest_saved">Квест успешно сохранен</string>
-    <string name="quest_title_hint">Введите название квеста</string>
-    <string name="quest_description_hint">Введите описание квеста</string>
+    <string name="quest_title_hint">Название квеста</string>
+    <string name="quest_description_hint">Описание квеста</string>
+    <string name="button_quest_create_cancel">Отменить</string>
+    <string name="button_quest_create_done">Готово</string>
 </resources>
