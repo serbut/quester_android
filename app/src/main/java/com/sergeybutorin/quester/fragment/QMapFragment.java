@@ -204,21 +204,26 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback,
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng point) {
-                if (state == QUESTS_STATE.ADD) {
-                    Marker marker = mMap.addMarker(
-                            new MarkerOptions()
-                                    .position(point)
-                                    .title("title")
-                                    .snippet("snippet")
-                                    .draggable(true)
-                                    .icon(BitmapDescriptorFactory
-                                            .defaultMarker(BitmapDescriptorFactory.HUE_ROSE))
-                    );
-                    questToAdd.addPoint(point);
-                    questToAdd.addMarkers(marker);
+                switch (state){
+                    case DISPLAY:
+                        showQuests();
+                        break;
+                    case ADD:
+                        Marker marker = mMap.addMarker(
+                                new MarkerOptions()
+                                        .position(point)
+                                        .title("title")
+                                        .snippet("snippet")
+                                        .draggable(true)
+                                        .icon(BitmapDescriptorFactory
+                                                .defaultMarker(BitmapDescriptorFactory.HUE_ROSE))
+                        );
+                        questToAdd.addPoint(point);
+                        questToAdd.addMarkers(marker);
 
-                    LatLng position = marker.getPosition();
-                    Log.d(TAG, position.latitude + ", " + position.longitude);
+                        LatLng position = marker.getPosition();
+                        Log.d(TAG, position.latitude + ", " + position.longitude);
+                        break;
                 }
             }
         });
