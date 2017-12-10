@@ -108,6 +108,7 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback,
             @Override
             public void onClick(View view) {
                 state = QUESTS_STATE.ADD;
+                mMap.clear();
                 switchState();
             }
         });
