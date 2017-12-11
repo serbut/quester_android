@@ -9,16 +9,16 @@
             android:title="@string/login_button_text" />
         <item
             android:id="@+id/nav_map"
-            android:title="@string/nav_map" />
+            android:title="@string/map" />
         <item
             android:id="@+id/nav_my_places"
-            android:title="@string/nav_my_places" />
+            android:title="@string/my_places" />
         <item
             android:id="@+id/nav_favourites"
-            android:title="@string/nav_favourites" />
+            android:title="@string/favourites" />
         <item
             android:id="@+id/nav_profile"
-            android:title="@string/nav_profile"
+            android:title="@string/profile"
             android:visible="false" />
     </group>
 </menu>

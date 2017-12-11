@@ -3,10 +3,12 @@
     <string name="email_hint">Email</string>
     <string name="password_hint">Пароль</string>
     <string name="login_button_text">Войти</string>
-    <string name="nav_my_places">Мои места</string>
-    <string name="nav_profile">Профиль</string>
-    <string name="nav_favourites">Избранное</string>
-    <string name="nav_map">Карта</string>
+    <string name="my_places">Мои места</string>
+    <string name="toolbar_auth">Авторизация</string>
+    <string name="toolbar_add_quest">Добавление квеста</string>
+    <string name="profile">Профиль</string>
+    <string name="favourites">Избранное</string>
+    <string name="map">Карта</string>
     <string name="signup_button_text">Зарегистрироваться</string>
     <string name="firstname_hint">Введите имя</string>
     <string name="lastname_hint">Введите фамилию</string>

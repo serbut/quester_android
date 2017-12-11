@@ -110,6 +110,7 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback,
         super.onViewCreated(view, savedInstanceState);
 
         ButterKnife.bind(this, view);
+        getActivity().setTitle(R.string.map);
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
         isLoggedIn = SPHelper.getInstance(getContext()).isUserSet();
 

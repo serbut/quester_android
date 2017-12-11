@@ -1,15 +1,14 @@
 package com.sergeybutorin.quester.fragment;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -52,6 +51,9 @@ public class QuestAddFragment extends Fragment implements QuestController.AddQue
         View view = inflater.inflate(R.layout.fragment_add_quest, container, false);
 
         ButterKnife.bind(this, view);
+
+        getActivity().setTitle(R.string.toolbar_add_quest);
+
         questSavedListener = (QuestSavedListener) getActivity();
 
         Bundle bundle = this.getArguments();

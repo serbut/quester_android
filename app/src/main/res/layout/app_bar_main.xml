@@ -7,9 +7,9 @@
     tools:context=".activity.MainActivity"
     android:orientation="vertical">
 
-    <android.support.design.widget.AppBarLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+    <!--<android.support.design.widget.AppBarLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content">-->
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
@@ -18,7 +18,7 @@
             android:background="?attr/colorPrimary"
             app:titleTextColor="@android:color/white" />
 
-    </android.support.design.widget.AppBarLayout>
+    <!--</android.support.design.widget.AppBarLayout>-->
 
     <FrameLayout
         android:id="@+id/content"

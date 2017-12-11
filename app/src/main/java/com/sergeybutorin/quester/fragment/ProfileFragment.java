@@ -42,6 +42,7 @@ public class ProfileFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
 
         ButterKnife.bind(this, view);
+        getActivity().setTitle(R.string.profile);
         Answers.getInstance().logCustom(new CustomEvent("Profile"));
 
         return view;
