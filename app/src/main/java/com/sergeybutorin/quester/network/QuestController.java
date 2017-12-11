@@ -11,6 +11,7 @@ import com.sergeybutorin.quester.network.api.QuestAPI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
@@ -60,7 +61,8 @@ public class QuestController {
     }
 
     public void add(Quest quest, String token) {
-        api.newQuest(token, new Quest(quest.getTitle(),
+        api.newQuest(token, new Quest(quest.getUuid(),
+                quest.getTitle(),
                 quest.getDescription(),
                 quest.getPoints())).enqueue(new Callback<Quest>() {
             @Override
@@ -87,17 +89,19 @@ public class QuestController {
                 final boolean isSuccess = response.code() == 200;
                 final List<QuestBase> quests = response.body();
                 if (isSuccess && quests != null) {
-                    Map<Integer, Integer> idVersionQuest = new HashMap<>();
+                    Map<UUID, Integer> idVersionQuest = new HashMap<>();
                     for (QuestBase q : savedQuests) {
-                        idVersionQuest.put(q.getId(), q.getVersion());
+                        idVersionQuest.put(q.getUuid(), q.getVersion());
                     }
                     for (QuestBase quest : quests) {
-                        int id = quest.getId();
-                        if (!idVersionQuest.containsKey(id) ||
-                                idVersionQuest.get(id) < quest.getVersion()) {
-                            getDetails(id);
+                        UUID uuid = quest.getUuid();
+                        if (!idVersionQuest.containsKey(uuid) ||
+                                idVersionQuest.get(uuid) < quest.getVersion()) {
+                            getDetails(uuid);
                         }
                     }
+
+                    // TODO: get is saved version less then version on server
                 }
             }
 
@@ -108,8 +112,8 @@ public class QuestController {
         });
     }
 
-    private void getDetails(int id) {
-        api.getQuestDetails(id).enqueue(new Callback<Quest>() {
+    private void getDetails(UUID uuid) {
+        api.getQuestDetails(uuid).enqueue(new Callback<Quest>() {
             @Override
             public void onResponse(@NonNull Call<Quest> call, @NonNull Response<Quest> response) {
                 final boolean isSuccess = response.code() == 200;

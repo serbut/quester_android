@@ -7,6 +7,7 @@ import com.sergeybutorin.quester.model.SignupRequest;
 import com.sergeybutorin.quester.model.UserProfile;
 
 import java.util.List;
+import java.util.UUID;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -25,6 +26,6 @@ public interface QuestAPI {
     @POST("quest/get_all")
     Call<List<QuestBase>> getAllQuests();
 
-    @POST("quest/{id}/details")
-    Call<Quest> getQuestDetails(@Path("id") int questId);
+    @POST("quest/{uuid}/details")
+    Call<Quest> getQuestDetails(@Path("uuid") UUID questUuid);
 }

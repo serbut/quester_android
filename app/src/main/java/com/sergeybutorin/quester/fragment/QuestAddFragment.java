@@ -81,6 +81,7 @@ public class QuestAddFragment extends Fragment implements QuestController.AddQue
         String token = SPHelper.getInstance(getContext()).getUserToken();
         quest.setTitle(title);
         quest.setDescription(description);
+        questSavedListener.onQuestSaved(quest);
         controller.add(quest, token);
     }
 
@@ -102,7 +103,7 @@ public class QuestAddFragment extends Fragment implements QuestController.AddQue
             Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
         } else if (quest != null) {
             Answers.getInstance().logCustom(new CustomEvent("Quest Add"));
-            questSavedListener.onQuestSaved(quest);
+//            questSavedListener.onQuestSaved(quest);
         }
     }
 }

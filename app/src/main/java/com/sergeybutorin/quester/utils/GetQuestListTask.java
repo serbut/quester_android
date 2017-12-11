@@ -7,8 +7,10 @@ import android.os.AsyncTask;
 import com.sergeybutorin.quester.fragment.QMapFragment;
 import com.sergeybutorin.quester.model.QuestBase;
 
+import java.nio.ByteBuffer;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Created by sergeybutorin on 09/12/2017.
@@ -29,6 +31,7 @@ public class GetQuestListTask extends AsyncTask<Void, Void, List<QuestBase>> {
 
         String[] questProjection = {
                 QuesterDbHelper.QuestEntry._ID,
+                QuesterDbHelper.QuestEntry.COLUMN_NAME_UUID,
                 QuesterDbHelper.QuestEntry.COLUMN_NAME_VERSION
         };
         String sortOrder =
@@ -40,10 +43,12 @@ public class GetQuestListTask extends AsyncTask<Void, Void, List<QuestBase>> {
 
         List<QuestBase> quests = new LinkedList<>();
         while(cursor.moveToNext()) {
-            int id = cursor.getInt(cursor.getColumnIndexOrThrow(QuesterDbHelper.QuestEntry._ID));
+            ByteBuffer bb = ByteBuffer.wrap(cursor.getBlob(cursor.
+                    getColumnIndexOrThrow(QuesterDbHelper.QuestEntry.COLUMN_NAME_UUID)));
+            UUID uuid = new UUID(bb.getLong(), bb.getLong());
             int version = cursor.getInt(
                     cursor.getColumnIndexOrThrow(QuesterDbHelper.QuestEntry.COLUMN_NAME_VERSION));
-            quests.add(new QuestBase(id, version));
+            quests.add(new QuestBase(uuid, version));
         }
         cursor.close();
         if (isCancelled()) return null;

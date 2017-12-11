@@ -28,6 +28,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.sergeybutorin.quester.R;
+import com.sergeybutorin.quester.model.Point;
 import com.sergeybutorin.quester.model.Quest;
 import com.sergeybutorin.quester.model.QuestBase;
 import com.sergeybutorin.quester.network.QuestController;
@@ -39,6 +40,7 @@ import com.sergeybutorin.quester.utils.SPHelper;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -73,7 +75,8 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback,
     private final LinkedList<Quest> quests = new LinkedList<>();
     private final java.util.HashMap<Marker, Quest> mapper = new java.util.HashMap<>();
 
-    private Quest questToAdd = new Quest();
+    private Quest questToAdd = new Quest(UUID.randomUUID());
+    private LinkedList<Marker> newQuestMarkers = new LinkedList<>();
     private Quest addedQuest;
     private boolean isLoggedIn = false;
 
@@ -168,7 +171,7 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback,
 
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
-            public void onMapClick(LatLng point) {
+            public void onMapClick(LatLng coordinates) {
                 switch (state){
                     case DISPLAY:
                         showQuests();
@@ -176,15 +179,15 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback,
                     case ADD:
                         Marker marker = mMap.addMarker(
                                 new MarkerOptions()
-                                        .position(point)
+                                        .position(coordinates)
                                         .title("title")
                                         .snippet("snippet")
                                         .draggable(true)
                                         .icon(BitmapDescriptorFactory
                                                 .defaultMarker(BitmapDescriptorFactory.HUE_ROSE))
                         );
-                        questToAdd.addPoint(point);
-                        questToAdd.addMarkers(marker);
+                        questToAdd.addPoint(new Point(UUID.randomUUID(), coordinates));
+                        newQuestMarkers.add(marker);
 
                         LatLng position = marker.getPosition();
                         Log.d(TAG, position.latitude + ", " + position.longitude);
@@ -341,7 +344,7 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback,
     @OnClick(R.id.fab_clear)
     void onClearButtonClick() {
         state = QUESTS_STATE.DISPLAY;
-        for(Marker marker : questToAdd.getMarkers()) {
+        for(Marker marker : newQuestMarkers) {
             marker.remove();
         }
         questToAdd.clear();
@@ -382,7 +385,7 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback,
     }
 
     private void showQuest(Quest quest) {
-        LatLng position = quest.getPoints().getFirst();
+        LatLng position = quest.getPoints().getFirst().getCoordinates();
         Marker marker = mMap.addMarker(
                 new MarkerOptions()
                         .position(position)
@@ -398,10 +401,10 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback,
         mMap.clear();
 
         int i = 1;
-        for (LatLng position: quest.getPoints()) {
+        for (Point position: quest.getPoints()) {
             mMap.addMarker(
                     new MarkerOptions()
-                            .position(position)
+                            .position(position.getCoordinates())
                             .title(quest.getTitle())
                             .snippet("#" + i)
                             .icon(BitmapDescriptorFactory.
@@ -417,7 +420,7 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback,
     }
 
     private void saveQuest(Quest quest) {
-        QuestAddTask questAddTask = new QuestAddTask(dbHelper, QMapFragment.this);
+        QuestAddTask questAddTask = new QuestAddTask(dbHelper);
         questAddTask.execute(quest);
         addQuest(quest);
     }
@@ -426,7 +429,7 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback,
     public void onAddResult(boolean success, int message, Quest quest) {
         if (mMap != null) {
             if (!success) {
-                Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
+//                Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
             } else if (quest != null) {
                 saveQuest(quest);
             }

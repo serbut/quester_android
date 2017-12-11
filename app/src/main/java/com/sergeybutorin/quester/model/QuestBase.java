@@ -1,29 +1,34 @@
 package com.sergeybutorin.quester.model;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 /**
  * Created by sergeybutorin on 09/12/2017.
  */
 
 public class QuestBase implements Serializable {
-    private int id;
+    private UUID uuid;
     private int version;
 
     public QuestBase() {
     }
 
-    public QuestBase(int id, int version) {
-        this.id = id;
+    public QuestBase(UUID uuid) {
+        this.uuid = uuid;
+    }
+
+    public QuestBase(UUID uuid, int version) {
+        this.uuid = uuid;
         this.version = version;
     }
 
-    public int getId() {
-        return id;
+    public UUID getUuid() {
+        return uuid;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
     }
 
     public int getVersion() {
