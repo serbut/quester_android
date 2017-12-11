@@ -13,6 +13,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.crashlytics.android.answers.Answers;
+import com.crashlytics.android.answers.CustomEvent;
 import com.sergeybutorin.quester.R;
 import com.sergeybutorin.quester.activity.MainActivity;
 import com.sergeybutorin.quester.model.Quest;
@@ -99,6 +101,7 @@ public class QuestAddFragment extends Fragment implements QuestController.AddQue
         if (!success) {
             Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
         } else if (quest != null) {
+            Answers.getInstance().logCustom(new CustomEvent("Quest Add"));
             questSavedListener.onQuestSaved(quest);
         }
     }

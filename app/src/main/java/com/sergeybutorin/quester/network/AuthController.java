@@ -7,6 +7,7 @@ import com.sergeybutorin.quester.R;
 import com.sergeybutorin.quester.model.LoginRequest;
 import com.sergeybutorin.quester.model.SignupRequest;
 import com.sergeybutorin.quester.model.UserProfile;
+import com.sergeybutorin.quester.network.api.UserAPI;
 
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
@@ -60,7 +61,7 @@ public class AuthController {
             public void onResponse(@NonNull Call<UserProfile> call, @NonNull Response<UserProfile> response) {
                 final boolean isSuccess = response.code() == 200;
                 if (isSuccess) {
-                    loginResult.onResult(true, R.string.auth_ok, response.body());
+                    loginResult.onLoginResult(true, R.string.auth_ok, response.body());
                     return;
                 }
                 int message;
@@ -76,13 +77,13 @@ public class AuthController {
                         break;
                 }
                 if (loginResult != null) {
-                    loginResult.onResult(false, message, null);
+                    loginResult.onLoginResult(false, message, null);
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<UserProfile> call, @NonNull Throwable t) {
-                loginResult.onResult(false, R.string.error_network_message, null);
+                loginResult.onLoginResult(false, R.string.error_network_message, null);
             }
         });
     }
@@ -93,7 +94,7 @@ public class AuthController {
             public void onResponse(@NonNull Call<UserProfile> call, @NonNull Response<UserProfile> response) {
                 final boolean isSuccess = response.code() == 200;
                 if (isSuccess) {
-                    signupResult.onResult(true, R.string.auth_ok, response.body());
+                    signupResult.onSignupResult(true, R.string.auth_ok, response.body());
                     return;
                 }
                 int message;
@@ -109,22 +110,22 @@ public class AuthController {
                         break;
                 }
                 if (signupResult != null) {
-                    signupResult.onResult(false, message, null);
+                    signupResult.onSignupResult(false, message, null);
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<UserProfile> call, @NonNull Throwable t) {
-                signupResult.onResult(false, R.string.error_network_message, null);
+                signupResult.onSignupResult(false, R.string.error_network_message, null);
             }
         });
     }
 
     public interface LoginListener {
-        void onResult(boolean success, int message, UserProfile user);
+        void onLoginResult(boolean success, int message, UserProfile user);
     }
 
     public interface SignupListener {
-        void onResult(boolean success, int message, UserProfile user);
+        void onSignupResult(boolean success, int message, UserProfile user);
     }
 }

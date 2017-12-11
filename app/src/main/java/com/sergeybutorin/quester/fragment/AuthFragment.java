@@ -13,6 +13,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.crashlytics.android.answers.Answers;
+import com.crashlytics.android.answers.LoginEvent;
+import com.crashlytics.android.answers.SignUpEvent;
 import com.sergeybutorin.quester.Constants;
 import com.sergeybutorin.quester.R;
 import com.sergeybutorin.quester.activity.MainActivity;
@@ -129,7 +132,20 @@ public class AuthFragment extends Fragment
     }
 
     @Override
-    public void onResult(boolean success, int message, UserProfile user) {
+    public void onLoginResult(boolean success, int message, UserProfile user) {
+        Answers.getInstance().logLogin(new LoginEvent()
+                .putSuccess(success));
+        setUser(success, message, user);
+    }
+
+    @Override
+    public void onSignupResult(boolean success, int message, UserProfile user) {
+        Answers.getInstance().logSignUp(new SignUpEvent()
+                .putSuccess(success));
+        setUser(success, message, user);
+    }
+
+    private void setUser(boolean success, int message, UserProfile user) {
         if (!success) {
             Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
         } else if (user != null) {

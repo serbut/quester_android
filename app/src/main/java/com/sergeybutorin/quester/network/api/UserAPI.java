@@ -1,4 +1,4 @@
-package com.sergeybutorin.quester.network;
+package com.sergeybutorin.quester.network.api;
 
 import com.sergeybutorin.quester.model.LoginRequest;
 import com.sergeybutorin.quester.model.Quest;
@@ -18,7 +18,7 @@ import retrofit2.http.Path;
  * Created by sergeybutorin on 05/11/2017.
  */
 
-interface UserAPI {
+public interface UserAPI {
     @POST("user/login")
     Call<UserProfile> login(@Body LoginRequest request);
 

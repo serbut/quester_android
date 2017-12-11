@@ -6,6 +6,7 @@ import com.sergeybutorin.quester.Constants;
 import com.sergeybutorin.quester.R;
 import com.sergeybutorin.quester.model.Quest;
 import com.sergeybutorin.quester.model.QuestBase;
+import com.sergeybutorin.quester.network.api.QuestAPI;
 
 import java.util.HashMap;
 import java.util.List;
