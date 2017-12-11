@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 
+import com.crashlytics.android.Crashlytics;
 import com.sergeybutorin.quester.R;
 import com.sergeybutorin.quester.fragment.AuthFragment;
 import com.sergeybutorin.quester.fragment.ProfileFragment;
@@ -23,6 +24,8 @@ import com.sergeybutorin.quester.fragment.QuestAddFragment;
 import com.sergeybutorin.quester.model.Quest;
 import com.sergeybutorin.quester.model.UserProfile;
 import com.sergeybutorin.quester.utils.SPHelper;
+
+import io.fabric.sdk.android.Fabric;
 
 
 public class MainActivity extends AppCompatActivity
@@ -54,6 +57,8 @@ public class MainActivity extends AppCompatActivity
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Fabric.with(this, new Crashlytics());
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
