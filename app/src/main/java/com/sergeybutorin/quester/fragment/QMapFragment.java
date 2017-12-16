@@ -68,7 +68,7 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback,
 
     private static final int DEFAULT_ZOOM = 15;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
-    private final LatLng mDefaultLocation = new LatLng(55.749465, 37.631988);
+    private LatLng mDefaultLocation = new LatLng(55.749465, 37.631988);
 
     private enum QUESTS_STATE {DISPLAY, ADD}
 
@@ -205,7 +205,9 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback,
             String token = SPHelper.getInstance(getContext()).getUserToken();
             saveQuest(addedQuest);
             controller.add(addedQuest, token);
-            // TODO: Go to new quest position
+            mDefaultLocation = addedQuest.getPoints().getFirst().getCoordinates();
+            mMap.moveCamera(CameraUpdateFactory
+                    .newLatLngZoom(mDefaultLocation, DEFAULT_ZOOM));
         }
     }
 
@@ -242,7 +244,7 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback,
                         if (task.isSuccessful()) {
                             // Set the map's camera position to the current location of the device.
                             mLastKnownLocation = task.getResult();
-                            if (mLastKnownLocation != null) {
+                            if (mLastKnownLocation != null && addedQuest == null) {
                                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                                         new LatLng(mLastKnownLocation.getLatitude(),
                                                 mLastKnownLocation.getLongitude()), DEFAULT_ZOOM));
