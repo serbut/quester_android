@@ -57,7 +57,7 @@ public class AuthFragment extends Fragment
 
         ButterKnife.bind(this, view);
 
-        getActivity().setTitle(R.string.toolbar_auth);
+        getActivity().setTitle(R.string.auth_text);
 
         controller = AuthController.getInstance();
         controller.setLoginResultListener(this);
