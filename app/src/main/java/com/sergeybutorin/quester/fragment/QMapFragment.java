@@ -336,7 +336,6 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback,
             Toast.makeText(getContext(), R.string.error_no_points_quests, Toast.LENGTH_SHORT).show();
         } else {
             state = QUESTS_STATE.DISPLAY;
-
             questAddListener.onPointsAdded(questToAdd);
         }
     }
@@ -349,6 +348,7 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback,
         }
         questToAdd.clear();
         switchState();
+        showQuests();
     }
 
     @OnClick(R.id.fab_back)
