@@ -17,8 +17,6 @@ import com.crashlytics.android.answers.CustomEvent;
 import com.sergeybutorin.quester.R;
 import com.sergeybutorin.quester.activity.MainActivity;
 import com.sergeybutorin.quester.model.Quest;
-import com.sergeybutorin.quester.network.QuestController;
-import com.sergeybutorin.quester.utils.SPHelper;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -28,10 +26,9 @@ import butterknife.OnClick;
  * Created by sergeybutorin on 10/12/2017.
  */
 
-public class QuestAddFragment extends Fragment implements QuestController.AddQuestListener {
+public class QuestAddFragment extends Fragment {
 
     public static final String QUEST_ARG = "QUEST_ARG";
-    private QuestController controller;
     QuestSavedListener questSavedListener;
 
     Quest quest;
@@ -61,11 +58,7 @@ public class QuestAddFragment extends Fragment implements QuestController.AddQue
             throw new IllegalArgumentException();
         }
 
-        controller = QuestController.getInstance();
-        controller.setAddQuestListener(this);
-
         quest = (Quest) bundle.getSerializable(QUEST_ARG);
-        Log.d("QUEST_ADD", "Points: " + quest.getPoints().toString());
         return view;
     }
 
@@ -80,32 +73,19 @@ public class QuestAddFragment extends Fragment implements QuestController.AddQue
             Toast.makeText(getContext(), R.string.error_empty_strings, Toast.LENGTH_LONG).show();
             return;
         }
-        String token = SPHelper.getInstance(getContext()).getUserToken();
         quest.setTitle(title);
         quest.setDescription(description);
         questSavedListener.onQuestSaved(quest);
-        controller.add(quest, token);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        controller.setAddQuestListener(null);
     }
 
     @OnClick(R.id.button_quest_create_cancel)
     void onCancelButtonClick() {
         ((MainActivity)getActivity()).hideSoftKeyboard();
         questSavedListener.onQuestSaved(null);
-    }
-
-    @Override
-    public void onAddResult(boolean success, int message, Quest quest) {
-        if (!success) {
-            Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
-        } else if (quest != null) {
-            Answers.getInstance().logCustom(new CustomEvent("Quest Add"));
-//            questSavedListener.onQuestSaved(quest);
-        }
     }
 }

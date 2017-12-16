@@ -3,6 +3,7 @@ package com.sergeybutorin.quester.utils;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.sergeybutorin.quester.fragment.QMapFragment;
 import com.sergeybutorin.quester.model.QuestBase;
@@ -58,6 +59,7 @@ public class GetQuestListTask extends AsyncTask<Void, Void, List<QuestBase>> {
     @Override
     protected void onPostExecute(List<QuestBase> savedQuests) {
         super.onPostExecute(savedQuests);
+        Log.d("GetQuestListTask", "Quest count in memory: " + savedQuests.size());
         fragment.getNewQuests(savedQuests);
     }
 }

@@ -6,6 +6,7 @@ import java.util.UUID;
 
 public class Quest extends QuestBase implements Serializable {
     private int id;
+    private boolean synced = false;
     private String title = "Очень классный маршрут";
     private String description = "Это очень классный маршрут! Советую посетить всем!";
     private LinkedList<Point> points = new LinkedList<>();
@@ -14,15 +15,17 @@ public class Quest extends QuestBase implements Serializable {
     }
 
     public Quest(UUID uuid) {
-        super(uuid, 0);
+        super(uuid);
     }
 
     public Quest(int id,
                  UUID uuid,
                  int version,
+                 boolean synced,
                  String title,
                  String description) {
         super(uuid, version);
+        this.synced = synced;
         this.id = id;
         this.title = title;
         this.description = description;
@@ -76,5 +79,13 @@ public class Quest extends QuestBase implements Serializable {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public boolean isSynced() {
+        return synced;
+    }
+
+    public void setSynced(boolean synced) {
+        this.synced = synced;
     }
 }

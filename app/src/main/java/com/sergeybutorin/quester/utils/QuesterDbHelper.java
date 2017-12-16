@@ -60,7 +60,7 @@ public class QuesterDbHelper extends SQLiteOpenHelper {
     private static final String SQL_CREATE_QUEST_TABLE =
             "CREATE TABLE " + QuestEntry.TABLE_NAME + " (" +
                     QuestEntry._ID + " INTEGER PRIMARY KEY, " +
-                    QuestEntry.COLUMN_NAME_UUID + " BLOB, " +
+                    QuestEntry.COLUMN_NAME_UUID + " VARCHAR(100) UNIQUE NOT NULL, " +
                     QuestEntry.COLUMN_NAME_SYNCED + " INTEGER DEFAULT 0, " +
                     QuestEntry.COLUMN_NAME_VERSION + " INTEGER DEFAULT 0, " +
                     QuestEntry.COLUMN_NAME_USER + " VARCHAR(100) NOT NULL, " +
@@ -71,7 +71,7 @@ public class QuesterDbHelper extends SQLiteOpenHelper {
     private static final String SQL_CREATE_POINT_TABLE =
             "CREATE TABLE " + PointEntry.TABLE_NAME + " (" +
                     PointEntry._ID + " INTEGER PRIMARY KEY, " +
-                    PointEntry.COLUMN_NAME_UUID + " BLOB, " +
+                    PointEntry.COLUMN_NAME_UUID + " BLOB UNIQUE NOT NULL, " +
                     PointEntry.COLUMN_NAME_QUEST + " INTEGER REFERENCES " +
                     QuestEntry.TABLE_NAME + "(" + QuestEntry._ID + ") NOT NULL, " +
                     PointEntry.COLUMN_NAME_ORDER + " INTEGER NOT NULL, " +

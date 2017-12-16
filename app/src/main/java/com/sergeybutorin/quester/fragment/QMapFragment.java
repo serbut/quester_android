@@ -34,6 +34,7 @@ import com.sergeybutorin.quester.model.QuestBase;
 import com.sergeybutorin.quester.network.QuestController;
 import com.sergeybutorin.quester.utils.GetQuestListTask;
 import com.sergeybutorin.quester.utils.QuestAddTask;
+import com.sergeybutorin.quester.utils.QuestUpdateTask;
 import com.sergeybutorin.quester.utils.QuesterDbHelper;
 import com.sergeybutorin.quester.utils.QuestsGetTask;
 import com.sergeybutorin.quester.utils.SPHelper;
@@ -201,7 +202,9 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback,
         questsGetTask.execute();
 
         if (addedQuest != null) {
+            String token = SPHelper.getInstance(getContext()).getUserToken();
             saveQuest(addedQuest);
+            controller.add(addedQuest, token);
             // TODO: Go to new quest position
         }
     }
@@ -332,13 +335,7 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback,
         } else {
             state = QUESTS_STATE.DISPLAY;
 
-            String token = SPHelper.getInstance(getContext()).getUserToken();
-
-            if (token == null) {
-                Toast.makeText(getContext(), R.string.error_no_authorized_quest, Toast.LENGTH_LONG).show();
-            } else {
-                questAddListener.onPointsAdded(questToAdd);
-            }
+            questAddListener.onPointsAdded(questToAdd);
         }
     }
 
@@ -426,13 +423,18 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback,
         addQuest(quest);
     }
 
+    private void updateQuest(Quest quest) {
+        QuestUpdateTask questUpdateTask = new QuestUpdateTask(dbHelper);
+        questUpdateTask.execute(quest);
+    }
+
     @Override
     public void onAddResult(boolean success, int message, Quest quest) {
         if (mMap != null) {
             if (!success) {
 //                Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
             } else if (quest != null) {
-                saveQuest(quest);
+                updateQuest(quest);
             }
         }
     }
@@ -446,5 +448,10 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback,
 
     public void getNewQuests(List<QuestBase> existingQuests) {
         controller.getMissing(existingQuests);
+    }
+
+    public void syncQuest(Quest quest) {
+        Log.d(TAG, "Not synced quest found");
+        controller.add(quest, SPHelper.getInstance(getContext()).getUserToken());
     }
 }

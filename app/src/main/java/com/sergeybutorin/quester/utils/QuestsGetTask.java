@@ -22,6 +22,8 @@ import java.util.UUID;
  */
 
 public class QuestsGetTask extends AsyncTask<Void, Quest, Void> {
+    public static final String TAG = QuestsGetTask.class.getSimpleName();
+
     private final QuesterDbHelper dbHelper;
     private final QMapFragment fragment;
 
@@ -39,6 +41,7 @@ public class QuestsGetTask extends AsyncTask<Void, Quest, Void> {
                 QuesterDbHelper.QuestEntry.COLUMN_NAME_UUID,
                 QuesterDbHelper.QuestEntry.COLUMN_NAME_TITLE,
                 QuesterDbHelper.QuestEntry.COLUMN_NAME_VERSION,
+                QuesterDbHelper.QuestEntry.COLUMN_NAME_SYNCED,
                 QuesterDbHelper.QuestEntry.COLUMN_NAME_DESCRIPTION
         };
         String sortOrder =
@@ -53,13 +56,15 @@ public class QuestsGetTask extends AsyncTask<Void, Quest, Void> {
             int id = cursor.getInt(cursor.getColumnIndexOrThrow(QuesterDbHelper.QuestEntry._ID));
             ByteBuffer bb = ByteBuffer.wrap(cursor.getBlob(cursor.
                     getColumnIndexOrThrow(QuesterDbHelper.QuestEntry.COLUMN_NAME_UUID)));
-            UUID uuid = new UUID(bb.getLong(), bb.getLong());
+            UUID uuid = Common.bytesToUuid(bb.array());
             int version = cursor.getInt(cursor.getColumnIndexOrThrow(QuesterDbHelper.QuestEntry.COLUMN_NAME_VERSION));
+            boolean synced = cursor.getInt(
+                    cursor.getColumnIndexOrThrow(QuesterDbHelper.QuestEntry.COLUMN_NAME_SYNCED)) == 1;
             String title = cursor.getString(
                     cursor.getColumnIndexOrThrow(QuesterDbHelper.QuestEntry.COLUMN_NAME_TITLE));
             String description = cursor.getString(
                     cursor.getColumnIndexOrThrow(QuesterDbHelper.QuestEntry.COLUMN_NAME_DESCRIPTION));
-            quests.add(new Quest(id, uuid, version, title, description));
+            quests.add(new Quest(id, uuid, version, synced, title, description));
         }
         cursor.close();
 
@@ -96,7 +101,10 @@ public class QuestsGetTask extends AsyncTask<Void, Quest, Void> {
     protected void onProgressUpdate(Quest... values) {
         super.onProgressUpdate(values);
         for (Quest q : values) {
-            Log.d("QUEST", "Quest loaded");
+            Log.d(TAG, "Quest loaded: " + q.getUuid() + "; synced: " + q.isSynced());
+            if (!q.isSynced()) {
+                fragment.syncQuest(q);
+            }
             fragment.addQuest(q);
         }
     }

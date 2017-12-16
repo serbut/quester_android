@@ -68,8 +68,10 @@ public class QuestController {
             @Override
             public void onResponse(@NonNull Call<Quest> call, @NonNull Response<Quest> response) {
                 final boolean isSuccess = response.code() == 200;
-                if (isSuccess) {
-                    addQuestListener.onAddResult(true, R.string.quest_saved, response.body());
+                Quest quest = response.body();
+                if (isSuccess && quest != null) {
+                    quest.setSynced(true);
+                    addQuestListener.onAddResult(true, R.string.quest_saved, quest);
                 } else {
                     addQuestListener.onAddResult(false, R.string.error_message, null);
                 }
@@ -107,6 +109,7 @@ public class QuestController {
 
             @Override
             public void onFailure(@NonNull Call<List<QuestBase>> call, @NonNull Throwable t) {
+
                 addQuestListener.onAddResult(false, R.string.error_network_message, null);
             }
         });
@@ -117,12 +120,13 @@ public class QuestController {
             @Override
             public void onResponse(@NonNull Call<Quest> call, @NonNull Response<Quest> response) {
                 final boolean isSuccess = response.code() == 200;
-                if (isSuccess) {
-                    getQuestListener.onGetResult(true, response.body());
+                Quest quest = response.body();
+                if (isSuccess && quest != null && !quest.getPoints().isEmpty()) {
+                    quest.setSynced(true);
+                    getQuestListener.onGetResult(true, quest);
                 } else {
                     getQuestListener.onGetResult(false, null);
                 }
-
             }
 
             @Override

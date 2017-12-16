@@ -3,6 +3,7 @@ package com.sergeybutorin.quester.utils;
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -27,14 +28,15 @@ public class QuestAddTask extends AsyncTask<Quest, Void, Void> {
     protected Void doInBackground(Quest... quests) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues questValues = new ContentValues();
-        questValues.put(QuesterDbHelper.QuestEntry.COLUMN_NAME_UUID, quests[0].getUuid().toString());
+        questValues.put(QuesterDbHelper.QuestEntry.COLUMN_NAME_UUID, Common.uuidToBytes(quests[0].getUuid()));
         questValues.put(QuesterDbHelper.QuestEntry.COLUMN_NAME_TITLE, quests[0].getTitle());
+        questValues.put(QuesterDbHelper.QuestEntry.COLUMN_NAME_SYNCED, quests[0].isSynced());
         questValues.put(QuesterDbHelper.QuestEntry.COLUMN_NAME_USER, "todo"); // TODO: get real email
         long newRowId = db.insert(QuesterDbHelper.QuestEntry.TABLE_NAME, null, questValues);
         int order = 0;
         for (Point point : quests[0].getPoints()) {
             ContentValues pointValues = new ContentValues();
-            questValues.put(QuesterDbHelper.PointEntry.COLUMN_NAME_UUID, point.getUuid().toString());
+            pointValues.put(QuesterDbHelper.PointEntry.COLUMN_NAME_UUID, Common.uuidToBytes(point.getUuid()));
             pointValues.put(QuesterDbHelper.PointEntry.COLUMN_NAME_QUEST, newRowId);
             pointValues.put(QuesterDbHelper.PointEntry.COLUMN_NAME_ORDER, order++);
             pointValues.put(QuesterDbHelper.PointEntry.COLUMN_NAME_X, point.getCoordinates().latitude);
