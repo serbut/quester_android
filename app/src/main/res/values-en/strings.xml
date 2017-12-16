@@ -4,7 +4,7 @@
     <string name="password_hint">Password</string>
     <string name="login_button_text">Log In</string>
     <string name="my_places">My places</string>
-    <string name="toolbar_add_quest">Добавление квеста</string>
+    <string name="toolbar_add_quest">Adding a quest</string>
     <string name="profile">Profile</string>
     <string name="favourites">Favourites</string>
     <string name="map">Map</string>
@@ -16,8 +16,8 @@
     <string name="error_wrong_data">Incorrect data</string>
     <string name="error_incorrect_email">Incorrect email</string>
     <string name="error_email_exists">User with such email already registered</string>
-    <string name="auth_text">Авторизация</string>
-    <string name="auth_ok">You are authorised</string>
+    <string name="auth_text">Authorization</string>
+    <string name="auth_ok">You are authorized</string>
     <string name="guest_name">Guest</string>
     <string name="logout_button_text">Logout</string>
     <string name="quest_add_btn">Add quest</string>
