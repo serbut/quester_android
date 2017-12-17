@@ -1,11 +1,13 @@
 package com.sergeybutorin.quester.fragment;
 
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,7 +30,8 @@ import static android.app.Activity.RESULT_OK;
  * Created by sergeybutorin on 10/12/2017.
  */
 
-public class ProfileFragment extends Fragment {
+public class ProfileFragment extends QFragment {
+    public static final String TAG = ProfileFragment.class.getSimpleName();
 
     private final int CAMERA_REQUEST_CODE = 0;
     private final int GALLERY_REQUEST_CODE = 1;
@@ -42,10 +45,19 @@ public class ProfileFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
 
         ButterKnife.bind(this, view);
-        getActivity().setTitle(R.string.profile);
         Answers.getInstance().logCustom(new CustomEvent("Profile"));
 
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        getActivity().setTitle(R.string.profile);
+
         return view;
+    }
+
+    @Override
+    public void setTitle() {
+        if (getActivity() != null) {
+            getActivity().setTitle(R.string.profile);
+        }
     }
 
     @OnClick(R.id.button_logout)
@@ -85,5 +97,4 @@ public class ProfileFragment extends Fragment {
                 break;
         }
     }
-
 }

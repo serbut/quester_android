@@ -2,18 +2,13 @@ package com.sergeybutorin.quester.fragment;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.crashlytics.android.answers.Answers;
-import com.crashlytics.android.answers.CustomEvent;
 import com.sergeybutorin.quester.R;
 import com.sergeybutorin.quester.activity.MainActivity;
 import com.sergeybutorin.quester.model.Quest;
@@ -26,7 +21,8 @@ import butterknife.OnClick;
  * Created by sergeybutorin on 10/12/2017.
  */
 
-public class QuestAddFragment extends Fragment {
+public class QuestAddFragment extends QFragment {
+    public static final String TAG = QuestAddFragment.class.getSimpleName();
 
     public static final String QUEST_ARG = "QUEST_ARG";
     QuestSavedListener questSavedListener;
@@ -49,8 +45,6 @@ public class QuestAddFragment extends Fragment {
 
         ButterKnife.bind(this, view);
 
-        getActivity().setTitle(R.string.toolbar_add_quest);
-
         questSavedListener = (QuestSavedListener) getActivity();
 
         Bundle bundle = this.getArguments();
@@ -59,7 +53,15 @@ public class QuestAddFragment extends Fragment {
         }
 
         quest = (Quest) bundle.getSerializable(QUEST_ARG);
+        getActivity().setTitle(R.string.toolbar_add_quest);
         return view;
+    }
+
+    @Override
+    public void setTitle() {
+        if (getActivity() != null) {
+            getActivity().setTitle(R.string.toolbar_add_quest);
+        }
     }
 
     @OnClick(R.id.button_quest_create_done)

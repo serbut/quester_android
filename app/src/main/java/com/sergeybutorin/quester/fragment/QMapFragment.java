@@ -1,5 +1,6 @@
 package com.sergeybutorin.quester.fragment;
 
+import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -51,7 +52,7 @@ import butterknife.OnClick;
  * Created by sergeybutorin on 29/10/2017.
  */
 
-public class QMapFragment extends Fragment implements OnMapReadyCallback,
+public class QMapFragment extends QFragment implements OnMapReadyCallback,
         QuestController.AddQuestListener,
         QuestController.GetQuestListener {
 
@@ -111,7 +112,6 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback,
         super.onViewCreated(view, savedInstanceState);
 
         ButterKnife.bind(this, view);
-        getActivity().setTitle(R.string.map);
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
         isLoggedIn = SPHelper.getInstance(getContext()).isUserSet();
 
@@ -137,6 +137,7 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback,
         if (bundle != null) {
             addedQuest = (Quest) bundle.getSerializable(QUEST_ARG);
         }
+        getActivity().setTitle(R.string.map);
     }
 
     /**
@@ -208,6 +209,13 @@ public class QMapFragment extends Fragment implements OnMapReadyCallback,
             mDefaultLocation = addedQuest.getPoints().getFirst().getCoordinates();
             mMap.moveCamera(CameraUpdateFactory
                     .newLatLngZoom(mDefaultLocation, DEFAULT_ZOOM));
+        }
+    }
+
+    @Override
+    public void setTitle() {
+        if (getActivity() != null) {
+            getActivity().setTitle(R.string.map);
         }
     }
 

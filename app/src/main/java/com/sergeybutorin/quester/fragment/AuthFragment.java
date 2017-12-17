@@ -31,9 +31,10 @@ import butterknife.OnClick;
  * Created by sergeybutorin on 03/11/2017.
  */
 
-public class AuthFragment extends Fragment
+public class AuthFragment extends QFragment
         implements AuthController.LoginListener,
         AuthController.SignupListener {
+    public static final String TAG = AuthFragment.class.getSimpleName();
 
     private boolean signupMode = false;
 
@@ -57,15 +58,21 @@ public class AuthFragment extends Fragment
 
         ButterKnife.bind(this, view);
 
-        getActivity().setTitle(R.string.auth_text);
-
         controller = AuthController.getInstance();
         controller.setLoginResultListener(this);
         controller.setSignupResultListener(this);
 
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        getActivity().setTitle(R.string.auth_text);
 
         return view;
+    }
+
+    @Override
+    public void setTitle() {
+        if (getActivity() != null) {
+            getActivity().setTitle(R.string.auth_text);
+        }
     }
 
     @OnClick(R.id.button_login)

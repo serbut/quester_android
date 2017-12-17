@@ -4,6 +4,9 @@ import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -19,6 +22,7 @@ import com.crashlytics.android.Crashlytics;
 import com.sergeybutorin.quester.R;
 import com.sergeybutorin.quester.fragment.AuthFragment;
 import com.sergeybutorin.quester.fragment.ProfileFragment;
+import com.sergeybutorin.quester.fragment.QFragment;
 import com.sergeybutorin.quester.fragment.QMapFragment;
 import com.sergeybutorin.quester.fragment.QuestAddFragment;
 import com.sergeybutorin.quester.model.Quest;
@@ -32,6 +36,7 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         QMapFragment.QuestAddListener,
         QuestAddFragment.QuestSavedListener {
+    private static String FRAGMENT_TAG = "FRAGMENT_TAG";
 
     private TextView nameTextView;
     private TextView emailTextView;
@@ -39,21 +44,14 @@ public class MainActivity extends AppCompatActivity
     private MenuItem profileItem;
     private SPHelper spHelper;
 
+    private QFragment currentFragment;
+    private QMapFragment qMapFragment = new QMapFragment();
+    private AuthFragment authFragment = new AuthFragment();
+    private ProfileFragment profileFragment = new ProfileFragment();
+    private QuestAddFragment questAddFragment = new QuestAddFragment();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
-        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-                .detectDiskReads()
-                .detectDiskWrites()
-                .detectNetwork()   // or .detectAll() for all detectable problems
-                .penaltyLog()
-                .build());
-        StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-                .detectLeakedSqlLiteObjects()
-                .detectLeakedClosableObjects()
-                .penaltyLog()
-                .penaltyDeath()
-                .build());
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -82,7 +80,12 @@ public class MainActivity extends AppCompatActivity
 
         setUserInformation();
 
-        getSupportFragmentManager().beginTransaction().replace(R.id.content, new QMapFragment()).commit();
+        if (savedInstanceState != null) {
+            currentFragment = (QFragment) getSupportFragmentManager()
+                    .getFragment(savedInstanceState, FRAGMENT_TAG);
+        } else {
+            changeFragment(qMapFragment, false);
+        }
     }
 
     @Override
@@ -93,6 +96,8 @@ public class MainActivity extends AppCompatActivity
         } else {
             super.onBackPressed();
         }
+        currentFragment = (QFragment) getSupportFragmentManager().findFragmentById(R.id.content);
+        currentFragment.setTitle();
     }
 
     @Override
@@ -102,19 +107,38 @@ public class MainActivity extends AppCompatActivity
 
         switch (id) {
             case R.id.nav_login:
-                getSupportFragmentManager().beginTransaction().replace(R.id.content, new AuthFragment()).commit();
+                changeFragment(authFragment, true);
                 break;
             case R.id.nav_map:
-                getSupportFragmentManager().beginTransaction().replace(R.id.content, new QMapFragment()).commit();
+                changeFragment(qMapFragment, false);
                 break;
             case R.id.nav_profile:
-                getSupportFragmentManager().beginTransaction().replace(R.id.content, new ProfileFragment()).commit();
+                changeFragment(profileFragment, true);
                 break;
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void changeFragment(QFragment fragment, boolean addToBackStack) {
+        if (currentFragment == fragment) { return; }
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        if (currentFragment != null) {
+            transaction.hide(currentFragment);
+        }
+        if (fragment.isAdded()) {
+            transaction.show(fragment);
+        } else {
+            transaction.add(R.id.content, fragment, FRAGMENT_TAG);
+        }
+        if (addToBackStack) {
+            transaction.addToBackStack(null);
+        }
+        currentFragment = fragment;
+        transaction.commit();
+        fragment.setTitle();
     }
 
     public void setUserInformation() {
@@ -140,29 +164,27 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onPointsAdded(Quest quest) {
-        QuestAddFragment questAddFragment = new QuestAddFragment();
         Bundle args = new Bundle();
         args.putSerializable(QuestAddFragment.QUEST_ARG, quest);
         questAddFragment.setArguments(args);
-        getSupportFragmentManager()
-                .beginTransaction().replace(R.id.content, questAddFragment).commit();
+        changeFragment(questAddFragment, true);
     }
 
     @Override
     public void onQuestSaved(Quest quest) {
-        QMapFragment qMapFragment = new QMapFragment();
         Bundle args = new Bundle();
         args.putSerializable(QMapFragment.QUEST_ARG, quest);
         qMapFragment.setArguments(args);
-        getSupportFragmentManager()
-                .beginTransaction().replace(R.id.content, qMapFragment).commit();
+        changeFragment(qMapFragment, false);
     }
 
     public void hideSoftKeyboard() {
         View view = getCurrentFocus();
         if(view != null) {
             InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-            inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+            if (inputMethodManager != null) {
+                inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+            }
         }
     }
 }
