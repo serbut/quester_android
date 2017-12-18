@@ -10,17 +10,20 @@ import java.util.UUID;
 
 public class Point {
     private UUID uuid;
-    private LatLng coordinates;
+    private double latitude;
+    private double longitude;
 
     public Point() {}
 
     public Point(LatLng coordinates) {
-        this.coordinates = coordinates;
+        this.latitude = coordinates.latitude;
+        this.longitude = coordinates.longitude;
     }
 
     public Point(UUID uuid, LatLng coordinates) {
         this.uuid = uuid;
-        this.coordinates = coordinates;
+        this.latitude = coordinates.latitude;
+        this.longitude = coordinates.longitude;
     }
 
     public UUID getUuid() {
@@ -31,11 +34,23 @@ public class Point {
         this.uuid = uuid;
     }
 
-    public LatLng getCoordinates() {
-        return coordinates;
+    public double getLongitude() {
+        return longitude;
     }
 
-    public void setCoordinates(LatLng coordinates) {
-        this.coordinates = coordinates;
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public LatLng getCoordinates() {
+        return new LatLng(latitude, longitude);
     }
 }
