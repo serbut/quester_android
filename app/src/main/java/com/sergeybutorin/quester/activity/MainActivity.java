@@ -1,5 +1,6 @@
 package com.sergeybutorin.quester.activity;
 
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.annotation.NonNull;
@@ -36,8 +37,6 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         QMapFragment.QuestAddListener,
         QuestAddFragment.QuestSavedListener {
-    private static String FRAGMENT_TAG = "FRAGMENT_TAG";
-
     private TextView nameTextView;
     private TextView emailTextView;
     private MenuItem loginItem;
@@ -55,10 +54,7 @@ public class MainActivity extends AppCompatActivity
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        configureCrashReporting();
-        setStrictMode();
-
+        
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -82,33 +78,10 @@ public class MainActivity extends AppCompatActivity
         setUserInformation();
 
         if (savedInstanceState != null) {
-            currentFragment = (QFragment) getSupportFragmentManager()
-                    .getFragment(savedInstanceState, FRAGMENT_TAG);
+            currentFragment = (QFragment) getSupportFragmentManager().findFragmentById(R.id.content);
         } else {
             changeFragment(qMapFragment, false);
         }
-    }
-
-    private void configureCrashReporting() {
-        CrashlyticsCore crashlyticsCore = new CrashlyticsCore.Builder()
-                .disabled(BuildConfig.DEBUG)
-                .build();
-        Fabric.with(this, new Crashlytics.Builder().core(crashlyticsCore).build());
-    }
-
-    private void setStrictMode() {
-        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-                .detectDiskReads()
-                .detectDiskWrites()
-                .detectNetwork()   // or .detectAll() for all detectable problems
-                .penaltyLog()
-                .build());
-        StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-                .detectLeakedSqlLiteObjects()
-                .detectLeakedClosableObjects()
-                .penaltyLog()
-                .penaltyDeath()
-                .build());
     }
 
     @Override
@@ -130,12 +103,14 @@ public class MainActivity extends AppCompatActivity
 
         switch (id) {
             case R.id.nav_login:
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
                 changeFragment(authFragment, true);
                 break;
             case R.id.nav_map:
                 changeFragment(qMapFragment, false);
                 break;
             case R.id.nav_profile:
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
                 changeFragment(profileFragment, true);
                 break;
         }
@@ -147,6 +122,9 @@ public class MainActivity extends AppCompatActivity
 
     private void changeFragment(QFragment fragment, boolean addToBackStack) {
         if (currentFragment == fragment) { return; }
+        if (fragment instanceof QMapFragment) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+        }
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         if (currentFragment != null) {
             transaction.hide(currentFragment);
@@ -154,7 +132,7 @@ public class MainActivity extends AppCompatActivity
         if (fragment.isAdded()) {
             transaction.show(fragment);
         } else {
-            transaction.add(R.id.content, fragment, FRAGMENT_TAG);
+            transaction.add(R.id.content, fragment);
         }
         if (addToBackStack) {
             transaction.addToBackStack(null);
@@ -188,15 +166,16 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onPointsAdded(Quest quest) {
         Bundle args = new Bundle();
-        args.putSerializable(QuestAddFragment.QUEST_ARG, quest);
+        args.putParcelable(QuestAddFragment.QUEST_ARG, quest);
         questAddFragment.setArguments(args);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         changeFragment(questAddFragment, true);
     }
 
     @Override
     public void onQuestSaved(Quest quest) {
         Bundle args = new Bundle();
-        args.putSerializable(QMapFragment.QUEST_ARG, quest);
+        args.putParcelable(QMapFragment.QUEST_ARG, quest);
         qMapFragment.setArguments(args);
         changeFragment(qMapFragment, false);
     }

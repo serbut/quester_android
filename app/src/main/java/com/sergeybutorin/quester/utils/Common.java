@@ -7,15 +7,15 @@ import java.util.UUID;
  * Created by sergeybutorin on 16/12/2017.
  */
 
-class Common {
-    static UUID bytesToUuid(byte[] bytes) {
+public class Common {
+    public static UUID bytesToUuid(byte[] bytes) {
         ByteBuffer bb = ByteBuffer.wrap(bytes);
         long firstLong = bb.getLong();
         long secondLong = bb.getLong();
         return new UUID(firstLong, secondLong);
     }
 
-    static byte[] uuidToBytes(UUID uuid) {
+    public static byte[] uuidToBytes(UUID uuid) {
         ByteBuffer bb = ByteBuffer.wrap(new byte[16]);
         bb.putLong(uuid.getMostSignificantBits());
         bb.putLong(uuid.getLeastSignificantBits());

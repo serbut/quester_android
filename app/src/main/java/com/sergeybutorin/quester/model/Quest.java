@@ -1,10 +1,12 @@
 package com.sergeybutorin.quester.model;
 
+import android.os.Parcelable;
+
 import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.UUID;
 
-public class Quest extends QuestBase implements Serializable {
+public class Quest extends QuestBase implements Parcelable {
     private int id;
     private boolean synced = false;
     private String title = "Очень классный маршрут";

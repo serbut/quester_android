@@ -9,6 +9,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.sergeybutorin.quester.fragment.QMapFragment;
 import com.sergeybutorin.quester.model.Point;
 import com.sergeybutorin.quester.model.Quest;
+import com.sergeybutorin.quester.presenters.QMapPresenter;
 
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
@@ -23,11 +24,11 @@ public class QuestsGetTask extends AsyncTask<Void, Quest, Void> {
     public static final String TAG = QuestsGetTask.class.getSimpleName();
 
     private final QuesterDbHelper dbHelper;
-    private final QMapFragment fragment;
+    private final QMapPresenter callback;
 
-    public QuestsGetTask(QuesterDbHelper questerDbHelper, QMapFragment fragment) {
+    public QuestsGetTask(QuesterDbHelper questerDbHelper, QMapPresenter callback) {
         this.dbHelper = questerDbHelper;
-        this.fragment = fragment;
+        this.callback = callback;
     }
 
     @Override
@@ -101,9 +102,9 @@ public class QuestsGetTask extends AsyncTask<Void, Quest, Void> {
         for (Quest q : values) {
             Log.d(TAG, "Quest loaded: " + q.getUuid() + "; synced: " + q.isSynced());
             if (!q.isSynced()) {
-                fragment.syncQuest(q);
+                callback.syncQuest(q);
             }
-            fragment.addQuest(q);
+            callback.addQuest(q);
         }
     }
 }

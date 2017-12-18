@@ -5,8 +5,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.sergeybutorin.quester.fragment.QMapFragment;
 import com.sergeybutorin.quester.model.QuestBase;
+import com.sergeybutorin.quester.presenters.IQMapPresenter;
 
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
@@ -19,11 +19,11 @@ import java.util.UUID;
 
 public class GetQuestListTask extends AsyncTask<Void, Void, List<QuestBase>> {
     private final QuesterDbHelper dbHelper;
-    private final QMapFragment fragment;
+    private final IQMapPresenter callback;
 
-    public GetQuestListTask(QuesterDbHelper questerDbHelper, QMapFragment fragment) {
+    public GetQuestListTask(QuesterDbHelper questerDbHelper, IQMapPresenter callback) {
         this.dbHelper = questerDbHelper;
-        this.fragment = fragment;
+        this.callback = callback;
     }
 
     @Override
@@ -60,6 +60,6 @@ public class GetQuestListTask extends AsyncTask<Void, Void, List<QuestBase>> {
     protected void onPostExecute(List<QuestBase> savedQuests) {
         super.onPostExecute(savedQuests);
         Log.d("GetQuestListTask", "Quest count in memory: " + savedQuests.size());
-        fragment.getNewQuests(savedQuests);
+        callback.getNewQuests(savedQuests);
     }
 }

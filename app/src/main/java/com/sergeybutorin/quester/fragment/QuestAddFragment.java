@@ -52,7 +52,7 @@ public class QuestAddFragment extends QFragment {
             throw new IllegalArgumentException();
         }
 
-        quest = (Quest) bundle.getSerializable(QUEST_ARG);
+        quest = bundle.getParcelable(QUEST_ARG);
         getActivity().setTitle(R.string.toolbar_add_quest);
         return view;
     }

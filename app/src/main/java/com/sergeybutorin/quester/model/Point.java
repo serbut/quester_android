@@ -1,5 +1,7 @@
 package com.sergeybutorin.quester.model;
 
+import android.os.Parcelable;
+
 import com.google.android.gms.maps.model.LatLng;
 
 import java.io.Serializable;
@@ -9,22 +11,19 @@ import java.util.UUID;
  * Created by sergeybutorin on 11/12/2017.
  */
 
-public class Point implements Serializable {
+public class Point {
     private UUID uuid;
-    private double latitude;
-    private double longitude;
+    private LatLng coordinates;
 
     public Point() {}
 
     public Point(LatLng coordinates) {
-        this.latitude = coordinates.latitude;
-        this.longitude = coordinates.longitude;
+        this.coordinates = coordinates;
     }
 
     public Point(UUID uuid, LatLng coordinates) {
         this.uuid = uuid;
-        this.latitude = coordinates.latitude;
-        this.longitude = coordinates.longitude;
+        this.coordinates = coordinates;
     }
 
     public UUID getUuid() {
@@ -35,23 +34,11 @@ public class Point implements Serializable {
         this.uuid = uuid;
     }
 
-    public double getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(double longitude) {
-        this.longitude = longitude;
-    }
-
-    public double getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(double latitude) {
-        this.latitude = latitude;
-    }
-
     public LatLng getCoordinates() {
-        return new LatLng(latitude, longitude);
+        return coordinates;
+    }
+
+    public void setCoordinates(LatLng coordinates) {
+        this.coordinates = coordinates;
     }
 }

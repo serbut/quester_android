@@ -45,7 +45,6 @@ public class ProfileFragment extends QFragment {
         ButterKnife.bind(this, view);
         Answers.getInstance().logCustom(new CustomEvent("Profile"));
 
-        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         getActivity().setTitle(R.string.profile);
 
         return view;

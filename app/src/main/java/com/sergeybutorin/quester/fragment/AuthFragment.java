@@ -60,7 +60,6 @@ public class AuthFragment extends QFragment
         controller.setLoginResultListener(this);
         controller.setSignupResultListener(this);
 
-        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         getActivity().setTitle(R.string.auth_text);
 
         return view;
