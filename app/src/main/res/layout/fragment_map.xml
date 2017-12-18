@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
+
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/map"
@@ -14,43 +15,42 @@
         tools:context="com.sergeybutorin.quester.activity.MainActivity">
     </fragment>
 
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_done"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        android:alpha="0"
+        android:src="@drawable/ic_done_white_24px"
+        app:backgroundTint="@color/colorGreen" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_clear"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        android:alpha="0"
+        android:src="@drawable/ic_clear_white_24px"
+        app:backgroundTint="@color/colorRed" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_add"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        android:src="@drawable/ic_add_white_24px"
+        app:backgroundTint="@color/colorGreen" />
 
     <LinearLayout
+        android:id="@+id/quest_detail_content"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="horizontal">
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <android.support.design.widget.FloatingActionButton
-                android:id="@+id/fab_done"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/fab_margin"
-                android:src="@drawable/ic_done_white_24px"
-                android:alpha="0"
-                app:backgroundTint="@color/colorGreen"
-                android:layout_gravity="bottom|end" />
-
-            <android.support.design.widget.FloatingActionButton
-                android:id="@+id/fab_clear"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/fab_margin"
-                android:src="@drawable/ic_clear_white_24px"
-                android:alpha="0"
-                app:backgroundTint="@color/colorRed"
-                android:layout_gravity="bottom|end" />
-
-            <android.support.design.widget.FloatingActionButton
-                android:id="@+id/fab_add"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/fab_margin"
-                android:src="@drawable/ic_add_white_24px"
-                app:backgroundTint="@color/colorGreen"
-                android:layout_gravity="bottom|end" />
-        </FrameLayout>
+        android:layout_height="0dp"
+        android:layout_margin="20dp"
+        android:background="@android:drawable/dialog_holo_light_frame"
+        android:orientation="vertical"
+        android:layout_gravity="bottom">
     </LinearLayout>
 </FrameLayout>

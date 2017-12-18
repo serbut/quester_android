@@ -26,6 +26,7 @@ import com.sergeybutorin.quester.fragment.ProfileFragment;
 import com.sergeybutorin.quester.fragment.QFragment;
 import com.sergeybutorin.quester.fragment.QMapFragment;
 import com.sergeybutorin.quester.fragment.QuestAddFragment;
+import com.sergeybutorin.quester.fragment.QuestDetailFragment;
 import com.sergeybutorin.quester.model.Quest;
 import com.sergeybutorin.quester.model.UserProfile;
 import com.sergeybutorin.quester.utils.SPHelper;
@@ -36,7 +37,8 @@ import io.fabric.sdk.android.Fabric;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         QMapFragment.QuestAddListener,
-        QuestAddFragment.QuestSavedListener {
+        QuestAddFragment.QuestSavedListener,
+        QMapFragment.QuestSelectedListener {
     private TextView nameTextView;
     private TextView emailTextView;
     private MenuItem loginItem;
@@ -138,7 +140,7 @@ public class MainActivity extends AppCompatActivity
             transaction.addToBackStack(null);
         }
         currentFragment = fragment;
-        transaction.commit();
+        transaction.commitAllowingStateLoss();
         fragment.setTitle();
     }
 
@@ -188,5 +190,15 @@ public class MainActivity extends AppCompatActivity
                 inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
             }
         }
+    }
+
+    @Override
+    public void onQuestSelected(Quest quest) {
+        QuestDetailFragment fragment = new QuestDetailFragment();
+        Bundle args = new Bundle();
+        args.putParcelable(QuestDetailFragment.QUEST_ARG, quest);
+        fragment.setArguments(args);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.quest_detail_content, fragment).commitAllowingStateLoss();
     }
 }

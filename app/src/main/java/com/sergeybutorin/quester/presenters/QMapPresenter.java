@@ -1,5 +1,7 @@
 package com.sergeybutorin.quester.presenters;
 
+import android.util.Log;
+
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.sergeybutorin.quester.QuesterApplication;
@@ -88,6 +90,8 @@ public class QMapPresenter extends BasePresenter<QMapView>
             case DISPLAY:
                 if (view() != null) {
                     view().showQuests(quests);
+                    view().closeDetailView();
+                    view().switchState(viewState);
                 }
                 break;
             case ADD:
@@ -105,6 +109,8 @@ public class QMapPresenter extends BasePresenter<QMapView>
         if (quest != null) {
             if (view() != null) {
                 view().showQuestDetail(quest);
+                view().openDetailView();
+                view().onQuestSelected(quest);
             }
         }
     }
@@ -191,6 +197,7 @@ public class QMapPresenter extends BasePresenter<QMapView>
     @Override
     public void onAddResult(boolean success, int message, Quest quest) {
         if (quest != null) {
+            Log.d(TAG, "Quest added, uuid = " + quest.getUuid());
             updateQuest(quest);
         }
     }
@@ -198,6 +205,7 @@ public class QMapPresenter extends BasePresenter<QMapView>
     @Override
     public void onGetResult(boolean success, Quest quest) {
         if (quest != null) {
+            Log.d(TAG, "Quest received, uuid = " + quest.getUuid());
             saveQuest(quest);
         }
     }

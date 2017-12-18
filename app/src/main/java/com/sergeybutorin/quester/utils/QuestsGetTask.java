@@ -101,6 +101,7 @@ public class QuestsGetTask extends AsyncTask<Void, Quest, Void> {
         super.onProgressUpdate(values);
         for (Quest q : values) {
             Log.d(TAG, "Quest loaded: " + q.getUuid() + "; synced: " + q.isSynced());
+            Log.d(TAG, "Quest description: " + q.getDescription());
             if (!q.isSynced()) {
                 callback.syncQuest(q);
             }

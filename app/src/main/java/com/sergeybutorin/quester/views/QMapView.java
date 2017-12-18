@@ -18,6 +18,9 @@ public interface QMapView {
     void addMarketToMap(LatLng coordinates);
     void showNoPointsInQuest();
     void onPointsAdded(Quest quest);
+    void onQuestSelected(Quest quest);
     void showQuestDetail(Quest quest);
     void setDefaultLocation(LatLng location);
+    void openDetailView();
+    void closeDetailView();
 }

@@ -1,6 +1,6 @@
 package com.sergeybutorin.quester.fragment;
 
-import android.content.pm.ActivityInfo;
+import android.animation.ValueAnimator;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.location.Location;
@@ -9,10 +9,14 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.LinearInterpolator;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -40,6 +44,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+import static android.content.res.Configuration.ORIENTATION_PORTRAIT;
+
 /**
  * Created by sergeybutorin on 29/10/2017.
  */
@@ -55,6 +61,7 @@ public class QMapFragment extends QFragment
 
     private QMapPresenter presenter;
     QuestAddListener questAddListener;
+    QuestSelectedListener questSelectedListener;
 
     private GoogleMap mMap;
 
@@ -72,11 +79,18 @@ public class QMapFragment extends QFragment
     FloatingActionButton fabDone;
     @BindView(R.id.fab_clear)
     FloatingActionButton fabClear;
+    @BindView(R.id.quest_detail_content)
+    LinearLayout detailLayout;
 
-    private final long animationDuration = 500L;
+    private final long ANIMATION_DURATION = 500L;
+    private int detailViewHeight = 0;
 
     public interface QuestAddListener {
         void onPointsAdded(Quest quest);
+    }
+
+    public interface QuestSelectedListener {
+        void onQuestSelected(Quest quest);
     }
 
     @Nullable
@@ -97,8 +111,11 @@ public class QMapFragment extends QFragment
         mapFragment.getMapAsync(this);
 
         questAddListener = (QuestAddListener) getActivity();
+        questSelectedListener = (QuestSelectedListener) getActivity();
 
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getContext());
+
+        setMaxDetailHeight();
     }
 
     @Override
@@ -148,10 +165,12 @@ public class QMapFragment extends QFragment
     public void onMapReady(GoogleMap googleMap) {
 
         mMap = googleMap;
+        mMap.getUiSettings().setMapToolbarEnabled(false);
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
                 presenter.onMarkerClicked(marker);
+                fabAdd.hide();
                 return false;
             }
         });
@@ -324,7 +343,7 @@ public class QMapFragment extends QFragment
         fabDone.animate()
                 .translationY(-1.5f * fabDone.getHeight())
                 .alpha(1)
-                .setDuration(animationDuration)
+                .setDuration(ANIMATION_DURATION)
                 .withEndAction(new Runnable() {
                     @Override
                     public void run() {
@@ -334,7 +353,7 @@ public class QMapFragment extends QFragment
         fabClear.animate()
                 .translationX(-1.5f * fabClear.getWidth())
                 .alpha(1)
-                .setDuration(animationDuration)
+                .setDuration(ANIMATION_DURATION)
                 .withEndAction(new Runnable() {
                     @Override
                     public void run() {
@@ -351,7 +370,7 @@ public class QMapFragment extends QFragment
         fabDone.animate()
                 .alpha(0)
                 .translationY(0)
-                .setDuration(animationDuration)
+                .setDuration(ANIMATION_DURATION)
                 .withEndAction(new Runnable() {
                     @Override
                     public void run() {
@@ -361,7 +380,7 @@ public class QMapFragment extends QFragment
         fabClear.animate()
                 .alpha(0)
                 .translationX(0)
-                .setDuration(animationDuration)
+                .setDuration(ANIMATION_DURATION)
                 .withEndAction(new Runnable() {
                     @Override
                     public void run() {
@@ -447,8 +466,64 @@ public class QMapFragment extends QFragment
     }
 
     @Override
+    public void onQuestSelected(Quest quest) {
+        questSelectedListener.onQuestSelected(quest);
+    }
+
+    @Override
     public void setDefaultLocation(LatLng location) {
         mDefaultLocation = location;
         setCamera(mDefaultLocation, mDefaultZoom);
+    }
+
+    @Override
+    public void openDetailView() {
+        final ViewGroup.LayoutParams layoutParams = detailLayout.getLayoutParams();
+
+        if (getResources().getConfiguration().orientation != ORIENTATION_PORTRAIT ||
+                layoutParams.height > 0) {
+            return;
+        }
+
+        ValueAnimator animateDetailUp = ValueAnimator.ofInt(0, detailViewHeight);
+        animateDetailUp.setDuration(ANIMATION_DURATION);
+        animateDetailUp.setInterpolator(new LinearInterpolator());
+        animateDetailUp.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                layoutParams.height = (int) animation.getAnimatedValue();
+                detailLayout.setLayoutParams(layoutParams);
+            }
+
+        });
+        animateDetailUp.start();
+    }
+
+    @Override
+    public void closeDetailView() {
+        final ViewGroup.LayoutParams layoutParams = detailLayout.getLayoutParams();
+        if (layoutParams.height < detailViewHeight) {
+            return;
+        }
+
+        ValueAnimator animateDetailDown = ValueAnimator.ofInt(detailViewHeight, 0);
+        animateDetailDown.setDuration(ANIMATION_DURATION);
+        animateDetailDown.setInterpolator(new LinearInterpolator());
+        animateDetailDown.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                layoutParams.height = (int) animation.getAnimatedValue();
+                detailLayout.setLayoutParams(layoutParams);
+            }
+
+        });
+        animateDetailDown.start();
+    }
+
+    private void setMaxDetailHeight() {
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        float height = displayMetrics.heightPixels;
+        detailViewHeight = (int) height/3;
     }
 }
