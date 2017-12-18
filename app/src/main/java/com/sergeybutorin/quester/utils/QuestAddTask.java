@@ -24,6 +24,7 @@ public class QuestAddTask extends AsyncTask<Quest, Void, Void> {
         ContentValues questValues = new ContentValues();
         questValues.put(QuesterDbHelper.QuestEntry.COLUMN_NAME_UUID, Common.uuidToBytes(quests[0].getUuid()));
         questValues.put(QuesterDbHelper.QuestEntry.COLUMN_NAME_TITLE, quests[0].getTitle());
+        questValues.put(QuesterDbHelper.QuestEntry.COLUMN_NAME_DESCRIPTION, quests[0].getDescription());
         questValues.put(QuesterDbHelper.QuestEntry.COLUMN_NAME_SYNCED, quests[0].isSynced());
         questValues.put(QuesterDbHelper.QuestEntry.COLUMN_NAME_USER, "todo"); // TODO: get real email
         long newRowId = db.insert(QuesterDbHelper.QuestEntry.TABLE_NAME, null, questValues);
