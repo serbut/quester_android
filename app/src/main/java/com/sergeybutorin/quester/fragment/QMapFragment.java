@@ -137,7 +137,6 @@ public class QMapFragment extends QFragment implements OnMapReadyCallback,
 
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getContext());
 
-
         dbHelper = QuesterDbHelper.getInstance(getContext());
 
         getQuestListTask = new GetQuestListTask(dbHelper, this);
@@ -448,7 +447,7 @@ public class QMapFragment extends QFragment implements OnMapReadyCallback,
                     }
                 }).start();
 
-        fabAdd.setClickable(false);
+        fabAdd.setEnabled(false);
         fabAdd.setBackgroundTintList(ColorStateList
                 .valueOf(ContextCompat.getColor(getContext(), R.color.colorGray)));
     }
@@ -475,7 +474,7 @@ public class QMapFragment extends QFragment implements OnMapReadyCallback,
                     }
                 }).start();
 
-        fabAdd.setClickable(true);
+        fabAdd.setEnabled(true);
         fabAdd.setBackgroundTintList(ColorStateList
                 .valueOf(ContextCompat.getColor(getContext(), R.color.colorGreen)));
     }
