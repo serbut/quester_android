@@ -1,6 +1,5 @@
 package com.sergeybutorin.quester.fragment;
 
-import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -8,7 +7,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -59,6 +57,12 @@ public class QMapFragment extends QFragment implements OnMapReadyCallback,
     public static final String TAG = QMapFragment.class.getSimpleName();
     public static final String QUEST_ARG = "QUEST_ARG";
 
+    private final String CAMERA_ZOOM_KEY = "CAMERA_ZOOM_KEY";
+    private final String CAMERA_POS_KEY = "CAMERA_POS_KEY";
+    private final String STATE_KEY = "STATE_KEY";
+    private final String QUEST_TO_ADD_KEY = "QUEST_TO_ADD_KEY";
+
+
     QuestAddListener questAddListener;
 
     private GoogleMap mMap;
@@ -67,20 +71,21 @@ public class QMapFragment extends QFragment implements OnMapReadyCallback,
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private Location mLastKnownLocation;
 
-    private static final int DEFAULT_ZOOM = 15;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
+    private float mDefaultZoom = 15;
     private LatLng mDefaultLocation = new LatLng(55.749465, 37.631988);
 
     private enum QUESTS_STATE {DISPLAY, ADD}
 
     private QUESTS_STATE state = QUESTS_STATE.DISPLAY;
-    private final LinkedList<Quest> quests = new LinkedList<>();
+    private LinkedList<Quest> quests = new LinkedList<>();
     private final java.util.HashMap<Marker, Quest> mapper = new java.util.HashMap<>();
 
     private Quest questToAdd = new Quest(UUID.randomUUID());
     private LinkedList<Marker> newQuestMarkers = new LinkedList<>();
     private Quest addedQuest;
     private boolean isLoggedIn = false;
+    private boolean isRestored = false;
 
     @BindView(R.id.fab_add)
     FloatingActionButton fabAdd;
@@ -114,15 +119,15 @@ public class QMapFragment extends QFragment implements OnMapReadyCallback,
         ButterKnife.bind(this, view);
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
         isLoggedIn = SPHelper.getInstance(getContext()).isUserSet();
+        getActivity().setTitle(R.string.map);
+
+        final SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
 
         questAddListener = (QuestAddListener) getActivity();
 
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getContext());
 
-        final SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
-
-        switchState();
 
         dbHelper = QuesterDbHelper.getInstance(getContext());
 
@@ -137,7 +142,38 @@ public class QMapFragment extends QFragment implements OnMapReadyCallback,
         if (bundle != null) {
             addedQuest = (Quest) bundle.getSerializable(QUEST_ARG);
         }
-        getActivity().setTitle(R.string.map);
+    }
+
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (mMap != null) {
+            if (mMap.getCameraPosition().target != null) {
+                outState.putSerializable(CAMERA_ZOOM_KEY, mMap.getCameraPosition().zoom);
+                outState.putParcelable(CAMERA_POS_KEY, mMap.getCameraPosition().target);
+            }
+            outState.putSerializable("newQuestMarkers", newQuestMarkers);
+            outState.putSerializable("Quests", quests);
+            outState.putSerializable(QUEST_TO_ADD_KEY, questToAdd);
+            outState.putSerializable(STATE_KEY, state);
+        }
+    }
+
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        if (savedInstanceState != null) {
+            if (savedInstanceState.containsKey(CAMERA_POS_KEY)) {
+                mDefaultLocation = savedInstanceState.getParcelable(CAMERA_POS_KEY);
+                mDefaultZoom = (float) savedInstanceState.getSerializable(CAMERA_ZOOM_KEY);
+            }
+//                quests = (LinkedList<Quest>) savedInstanceState.getSerializable("Quests");
+            questToAdd = (Quest) savedInstanceState.getSerializable(QUEST_TO_ADD_KEY);
+            newQuestMarkers = (LinkedList<Marker>) savedInstanceState.getSerializable("newQuestMarkers");
+            state = (QUESTS_STATE) savedInstanceState.getSerializable(STATE_KEY);
+            isRestored = true;
+        }
     }
 
     /**
@@ -168,14 +204,12 @@ public class QMapFragment extends QFragment implements OnMapReadyCallback,
             }
         });
 
-        showQuests();
-
         getLocationPermission();
 
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng coordinates) {
-                switch (state){
+                switch (state) {
                     case DISPLAY:
                         showQuests();
                         break;
@@ -199,17 +233,22 @@ public class QMapFragment extends QFragment implements OnMapReadyCallback,
             }
         });
 
-        questsGetTask = new QuestsGetTask(dbHelper, this);
-        questsGetTask.execute();
-
         if (addedQuest != null) {
             String token = SPHelper.getInstance(getContext()).getUserToken();
             saveQuest(addedQuest);
             controller.add(addedQuest, token);
             mDefaultLocation = addedQuest.getPoints().getFirst().getCoordinates();
-            mMap.moveCamera(CameraUpdateFactory
-                    .newLatLngZoom(mDefaultLocation, DEFAULT_ZOOM));
+            setCamera(mDefaultLocation, mDefaultZoom);
         }
+        if (isRestored) {
+            setCamera(mDefaultLocation, mDefaultZoom);
+//            showNewQuestMarkers();
+        } else {
+            questsGetTask = new QuestsGetTask(dbHelper, this);
+            questsGetTask.execute();
+        }
+
+        switchState();
     }
 
     @Override
@@ -252,25 +291,30 @@ public class QMapFragment extends QFragment implements OnMapReadyCallback,
                         if (task.isSuccessful()) {
                             // Set the map's camera position to the current location of the device.
                             mLastKnownLocation = task.getResult();
-                            if (mLastKnownLocation != null && addedQuest == null) {
-                                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                                        new LatLng(mLastKnownLocation.getLatitude(),
-                                                mLastKnownLocation.getLongitude()), DEFAULT_ZOOM));
+                            if (mLastKnownLocation != null
+                                    && addedQuest == null
+                                    && !isRestored) {
+                                setCamera(new LatLng(mLastKnownLocation.getLatitude(),
+                                        mLastKnownLocation.getLongitude()), mDefaultZoom);
                             }
                         } else {
                             Log.d(TAG, "Current location is null. Using defaults.");
                             Log.e(TAG, "Exception: %s", task.getException());
-                            mMap.moveCamera(CameraUpdateFactory
-                                    .newLatLngZoom(mDefaultLocation, DEFAULT_ZOOM));
+                            setCamera(mDefaultLocation, mDefaultZoom);
                             mMap.getUiSettings().setMyLocationButtonEnabled(false);
                         }
                     }
                 });
                 updateLocationUI();
             }
-        } catch (SecurityException e)  {
+        } catch (SecurityException e) {
             Log.e("Exception: %s", e.getMessage());
         }
+    }
+
+    private void setCamera(LatLng position, float zoom) {
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                position, zoom));
     }
 
     /**
@@ -326,7 +370,7 @@ public class QMapFragment extends QFragment implements OnMapReadyCallback,
                 mMap.getUiSettings().setMyLocationButtonEnabled(false);
                 mLastKnownLocation = null;
             }
-        } catch (SecurityException e)  {
+        } catch (SecurityException e) {
             Log.e("Exception: %s", e.getMessage());
         }
     }
@@ -334,7 +378,6 @@ public class QMapFragment extends QFragment implements OnMapReadyCallback,
     @OnClick(R.id.fab_add)
     void onAddButtonClick() {
         state = QUESTS_STATE.ADD;
-        mMap.clear();
         switchState();
     }
 
@@ -351,12 +394,7 @@ public class QMapFragment extends QFragment implements OnMapReadyCallback,
     @OnClick(R.id.fab_clear)
     void onClearButtonClick() {
         state = QUESTS_STATE.DISPLAY;
-        for(Marker marker : newQuestMarkers) {
-            marker.remove();
-        }
-        questToAdd.clear();
         switchState();
-        showQuests();
     }
 
     @OnClick(R.id.fab_back)
@@ -374,11 +412,17 @@ public class QMapFragment extends QFragment implements OnMapReadyCallback,
                 }
                 fabDone.hide();
                 fabClear.hide();
+                for (Marker marker : newQuestMarkers) {
+                    marker.remove();
+                }
+                questToAdd.clear();
+                showQuests();
                 break;
             case ADD:
                 fabAdd.hide();
                 fabDone.show();
                 fabClear.show();
+                mMap.clear();
                 break;
         }
     }
@@ -387,7 +431,7 @@ public class QMapFragment extends QFragment implements OnMapReadyCallback,
         fabBack.hide();
         mMap.clear();
 
-        for(Quest quest : quests) {
+        for (Quest quest : quests) {
             showQuest(quest);
         }
     }
@@ -405,11 +449,17 @@ public class QMapFragment extends QFragment implements OnMapReadyCallback,
         mapper.put(marker, quest);
     }
 
+//    private void showNewQuestMarkers() {
+//        for (Marker marker : newQuestMarkers) {
+//            mMap.addMarker((MarkerOptions) marker.getTag());
+//        }
+//    }
+
     private void showQuestDetail(Quest quest) {
         mMap.clear();
 
         int i = 1;
-        for (Point position: quest.getPoints()) {
+        for (Point position : quest.getPoints()) {
             mMap.addMarker(
                     new MarkerOptions()
                             .position(position.getCoordinates())
@@ -440,12 +490,8 @@ public class QMapFragment extends QFragment implements OnMapReadyCallback,
 
     @Override
     public void onAddResult(boolean success, int message, Quest quest) {
-        if (mMap != null) {
-            if (!success) {
-//                Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
-            } else if (quest != null) {
-                updateQuest(quest);
-            }
+        if (mMap != null && quest != null) {
+            updateQuest(quest);
         }
     }
 

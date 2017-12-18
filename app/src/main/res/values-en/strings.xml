@@ -1,6 +1,4 @@
 <resources>
-    <string name="app_name">Quester</string>
-    <string name="email_hint">Email</string>
     <string name="password_hint">Password</string>
     <string name="login_button_text">Log In</string>
     <string name="my_places">My places</string>

@@ -1,10 +1,7 @@
 package com.sergeybutorin.quester.network.api;
 
-import com.sergeybutorin.quester.model.LoginRequest;
 import com.sergeybutorin.quester.model.Quest;
 import com.sergeybutorin.quester.model.QuestBase;
-import com.sergeybutorin.quester.model.SignupRequest;
-import com.sergeybutorin.quester.model.UserProfile;
 
 import java.util.List;
 import java.util.UUID;

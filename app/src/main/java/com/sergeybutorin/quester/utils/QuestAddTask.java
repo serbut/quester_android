@@ -3,15 +3,9 @@ package com.sergeybutorin.quester.utils;
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
-import android.util.Log;
-import android.widget.Toast;
 
-import com.google.android.gms.maps.model.LatLng;
-import com.sergeybutorin.quester.R;
-import com.sergeybutorin.quester.fragment.QMapFragment;
 import com.sergeybutorin.quester.model.Point;
 import com.sergeybutorin.quester.model.Quest;
-import com.sergeybutorin.quester.model.UserProfile;
 
 /**
  * Created by sergeybutorin on 14/11/2017.

@@ -11,10 +11,8 @@ import com.sergeybutorin.quester.model.Point;
 import com.sergeybutorin.quester.model.Quest;
 
 import java.nio.ByteBuffer;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 /**

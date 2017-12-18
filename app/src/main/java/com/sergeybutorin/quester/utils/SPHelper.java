@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 
-import com.sergeybutorin.quester.Constants;
 import com.sergeybutorin.quester.model.UserProfile;
 
 /**
