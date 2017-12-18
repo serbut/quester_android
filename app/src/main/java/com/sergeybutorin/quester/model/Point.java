@@ -2,13 +2,14 @@ package com.sergeybutorin.quester.model;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import java.io.Serializable;
 import java.util.UUID;
 
 /**
  * Created by sergeybutorin on 11/12/2017.
  */
 
-public class Point {
+public class Point implements Serializable {
     private UUID uuid;
     private double latitude;
     private double longitude;

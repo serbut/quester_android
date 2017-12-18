@@ -17,6 +17,8 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 
 import com.crashlytics.android.Crashlytics;
+import com.crashlytics.android.core.CrashlyticsCore;
+import com.sergeybutorin.quester.BuildConfig;
 import com.sergeybutorin.quester.R;
 import com.sergeybutorin.quester.fragment.AuthFragment;
 import com.sergeybutorin.quester.fragment.ProfileFragment;
@@ -54,20 +56,8 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-                .detectDiskReads()
-                .detectDiskWrites()
-                .detectNetwork()   // or .detectAll() for all detectable problems
-                .penaltyLog()
-                .build());
-        StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-                .detectLeakedSqlLiteObjects()
-                .detectLeakedClosableObjects()
-                .penaltyLog()
-                .penaltyDeath()
-                .build());
-
-        Fabric.with(this, new Crashlytics());
+        configureCrashReporting();
+        setStrictMode();
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -97,6 +87,28 @@ public class MainActivity extends AppCompatActivity
         } else {
             changeFragment(qMapFragment, false);
         }
+    }
+
+    private void configureCrashReporting() {
+        CrashlyticsCore crashlyticsCore = new CrashlyticsCore.Builder()
+                .disabled(BuildConfig.DEBUG)
+                .build();
+        Fabric.with(this, new Crashlytics.Builder().core(crashlyticsCore).build());
+    }
+
+    private void setStrictMode() {
+        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                .detectDiskReads()
+                .detectDiskWrites()
+                .detectNetwork()   // or .detectAll() for all detectable problems
+                .penaltyLog()
+                .build());
+        StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+                .detectLeakedSqlLiteObjects()
+                .detectLeakedClosableObjects()
+                .penaltyLog()
+                .penaltyDeath()
+                .build());
     }
 
     @Override

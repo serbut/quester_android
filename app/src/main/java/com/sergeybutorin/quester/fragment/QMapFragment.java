@@ -1,7 +1,11 @@
 package com.sergeybutorin.quester.fragment;
 
+import android.animation.Animator;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -12,6 +16,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.TranslateAnimation;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -38,6 +46,8 @@ import com.sergeybutorin.quester.utils.QuesterDbHelper;
 import com.sergeybutorin.quester.utils.QuestsGetTask;
 import com.sergeybutorin.quester.utils.SPHelper;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -61,7 +71,6 @@ public class QMapFragment extends QFragment implements OnMapReadyCallback,
     private final String CAMERA_POS_KEY = "CAMERA_POS_KEY";
     private final String STATE_KEY = "STATE_KEY";
     private final String QUEST_TO_ADD_KEY = "QUEST_TO_ADD_KEY";
-
 
     QuestAddListener questAddListener;
 
@@ -93,14 +102,14 @@ public class QMapFragment extends QFragment implements OnMapReadyCallback,
     FloatingActionButton fabDone;
     @BindView(R.id.fab_clear)
     FloatingActionButton fabClear;
-    @BindView(R.id.fab_back)
-    FloatingActionButton fabBack;
 
     private QuesterDbHelper dbHelper;
     private QuestsGetTask questsGetTask;
     private GetQuestListTask getQuestListTask;
 
     private QuestController controller;
+
+    private final long animationDuration = 500L;
 
     public interface QuestAddListener {
         void onPointsAdded(Quest quest);
@@ -144,7 +153,6 @@ public class QMapFragment extends QFragment implements OnMapReadyCallback,
         }
     }
 
-
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -168,7 +176,7 @@ public class QMapFragment extends QFragment implements OnMapReadyCallback,
                 mDefaultLocation = savedInstanceState.getParcelable(CAMERA_POS_KEY);
                 mDefaultZoom = (float) savedInstanceState.getSerializable(CAMERA_ZOOM_KEY);
             }
-//                quests = (LinkedList<Quest>) savedInstanceState.getSerializable("Quests");
+            quests = (LinkedList<Quest>) savedInstanceState.getSerializable("Quests");
             questToAdd = (Quest) savedInstanceState.getSerializable(QUEST_TO_ADD_KEY);
             newQuestMarkers = (LinkedList<Marker>) savedInstanceState.getSerializable("newQuestMarkers");
             state = (QUESTS_STATE) savedInstanceState.getSerializable(STATE_KEY);
@@ -193,7 +201,6 @@ public class QMapFragment extends QFragment implements OnMapReadyCallback,
             public boolean onMarkerClick(Marker marker) {
                 Quest quest = mapper.get(marker);
                 if (quest != null) {
-                    fabBack.show();
                     showQuestDetail(quest);
                     Log.d(TAG, "onMarkerClick " + quest.getTitle());
                 } else {
@@ -242,7 +249,6 @@ public class QMapFragment extends QFragment implements OnMapReadyCallback,
         }
         if (isRestored) {
             setCamera(mDefaultLocation, mDefaultZoom);
-//            showNewQuestMarkers();
         } else {
             questsGetTask = new QuestsGetTask(dbHelper, this);
             questsGetTask.execute();
@@ -397,11 +403,6 @@ public class QMapFragment extends QFragment implements OnMapReadyCallback,
         switchState();
     }
 
-    @OnClick(R.id.fab_back)
-    void onBackButtonClick() {
-        showQuests();
-    }
-
     private void switchState() {
         switch (state) {
             case DISPLAY:
@@ -410,25 +411,76 @@ public class QMapFragment extends QFragment implements OnMapReadyCallback,
                 } else {
                     fabAdd.hide();
                 }
-                fabDone.hide();
-                fabClear.hide();
+                hideMenu();
                 for (Marker marker : newQuestMarkers) {
                     marker.remove();
                 }
+                fabAdd.setClickable(true);
                 questToAdd.clear();
                 showQuests();
                 break;
             case ADD:
-                fabAdd.hide();
-                fabDone.show();
-                fabClear.show();
+                showMenu();
                 mMap.clear();
                 break;
         }
     }
 
+    private void showMenu() {
+        fabDone.animate()
+                .translationY(-1.5f * fabDone.getHeight())
+                .alpha(1)
+                .setDuration(animationDuration)
+                .withEndAction(new Runnable() {
+                    @Override
+                    public void run() {
+                        fabDone.setEnabled(true);
+                    }
+                }).start();
+        fabClear.animate()
+                .translationX(-1.5f * fabClear.getWidth())
+                .alpha(1)
+                .setDuration(animationDuration)
+                .withEndAction(new Runnable() {
+                    @Override
+                    public void run() {
+                        fabClear.setEnabled(true);
+                    }
+                }).start();
+
+        fabAdd.setClickable(false);
+        fabAdd.setBackgroundTintList(ColorStateList
+                .valueOf(ContextCompat.getColor(getContext(), R.color.colorGray)));
+    }
+
+    private void hideMenu() {
+        fabDone.animate()
+                .alpha(0)
+                .translationY(0)
+                .setDuration(animationDuration)
+                .withEndAction(new Runnable() {
+                    @Override
+                    public void run() {
+                        fabDone.setEnabled(false);
+                    }
+                }).start();
+        fabClear.animate()
+                .alpha(0)
+                .translationX(0)
+                .setDuration(animationDuration)
+                .withEndAction(new Runnable() {
+                    @Override
+                    public void run() {
+                        fabClear.setEnabled(false);
+                    }
+                }).start();
+
+        fabAdd.setClickable(true);
+        fabAdd.setBackgroundTintList(ColorStateList
+                .valueOf(ContextCompat.getColor(getContext(), R.color.colorGreen)));
+    }
+
     private void showQuests() {
-        fabBack.hide();
         mMap.clear();
 
         for (Quest quest : quests) {
@@ -437,23 +489,19 @@ public class QMapFragment extends QFragment implements OnMapReadyCallback,
     }
 
     private void showQuest(Quest quest) {
-        LatLng position = quest.getPoints().getFirst().getCoordinates();
-        Marker marker = mMap.addMarker(
-                new MarkerOptions()
-                        .position(position)
-                        .title(quest.getTitle())
-                        .snippet(quest.getDescription())
-                        .icon(BitmapDescriptorFactory.
-                                defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
-        );
-        mapper.put(marker, quest);
+        if (mMap != null) {
+            LatLng position = quest.getPoints().getFirst().getCoordinates();
+            Marker marker = mMap.addMarker(
+                    new MarkerOptions()
+                            .position(position)
+                            .title(quest.getTitle())
+                            .snippet(quest.getDescription())
+                            .icon(BitmapDescriptorFactory.
+                                    defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
+            );
+            mapper.put(marker, quest);
+        }
     }
-
-//    private void showNewQuestMarkers() {
-//        for (Marker marker : newQuestMarkers) {
-//            mMap.addMarker((MarkerOptions) marker.getTag());
-//        }
-//    }
 
     private void showQuestDetail(Quest quest) {
         mMap.clear();
@@ -490,14 +538,14 @@ public class QMapFragment extends QFragment implements OnMapReadyCallback,
 
     @Override
     public void onAddResult(boolean success, int message, Quest quest) {
-        if (mMap != null && quest != null) {
+        if (quest != null) {
             updateQuest(quest);
         }
     }
 
     @Override
     public void onGetResult(boolean success, Quest quest) {
-        if (mMap != null && quest != null) {
+        if (quest != null) {
             saveQuest(quest);
         }
     }
