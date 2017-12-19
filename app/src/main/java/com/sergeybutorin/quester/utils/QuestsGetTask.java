@@ -69,6 +69,7 @@ public class QuestsGetTask extends AsyncTask<Void, Quest, Void> {
 
         String[] pointProjection = {
                 QuesterDbHelper.PointEntry.COLUMN_NAME_ORDER,
+                QuesterDbHelper.PointEntry.COLUMN_NAME_UUID,
                 QuesterDbHelper.PointEntry.COLUMN_NAME_X,
                 QuesterDbHelper.PointEntry.COLUMN_NAME_Y
         };
@@ -86,7 +87,11 @@ public class QuestsGetTask extends AsyncTask<Void, Quest, Void> {
             while(cursor.moveToNext()) {
                 double x = cursor.getDouble(cursor.getColumnIndexOrThrow(QuesterDbHelper.PointEntry.COLUMN_NAME_X));
                 double y = cursor.getDouble(cursor.getColumnIndexOrThrow(QuesterDbHelper.PointEntry.COLUMN_NAME_Y));
-                coordinates.add(new Point(new LatLng(x, y)));
+                ByteBuffer bb = ByteBuffer.wrap(cursor.getBlob(cursor.
+                        getColumnIndexOrThrow(QuesterDbHelper.PointEntry.COLUMN_NAME_UUID)));
+                UUID uuid = Common.bytesToUuid(bb.array());
+
+                coordinates.add(new Point(uuid, new LatLng(x, y)));
             }
             quest.setPoints(coordinates);
             if (isCancelled()) return null;
