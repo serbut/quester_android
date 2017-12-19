@@ -6,6 +6,7 @@ import android.os.PersistableBundle;
 import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -16,6 +17,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.crashlytics.android.Crashlytics;
@@ -49,6 +51,7 @@ public class MainActivity extends AppCompatActivity
     private MenuItem profileItem;
     private SPHelper spHelper;
 
+    private Fragment detailFragment;
     private QFragment currentFragment;
     private QMapFragment qMapFragment = new QMapFragment();
     private AuthFragment authFragment = new AuthFragment();
@@ -85,6 +88,7 @@ public class MainActivity extends AppCompatActivity
 
         if (savedInstanceState != null) {
             currentFragment = (QFragment) getSupportFragmentManager().findFragmentById(R.id.content);
+            detailFragment = getSupportFragmentManager().findFragmentById(R.id.quest_detail_content);
         } else {
             changeFragment(qMapFragment, false);
         }
@@ -200,7 +204,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onQuestSelected(Quest quest) {
+    public void onQuestDetailsRequested(Quest quest) {
         QuestDetailFragment fragment = new QuestDetailFragment();
         Bundle args = new Bundle();
         args.putParcelable(QuestDetailFragment.QUEST_ARG, quest);

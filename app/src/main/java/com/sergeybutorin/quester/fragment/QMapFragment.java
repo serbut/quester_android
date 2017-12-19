@@ -15,7 +15,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.LinearInterpolator;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -90,7 +89,7 @@ public class QMapFragment extends QFragment
     }
 
     public interface QuestSelectedListener {
-        void onQuestSelected(Quest quest);
+        void onQuestDetailsRequested(Quest quest);
     }
 
     @Nullable
@@ -165,7 +164,6 @@ public class QMapFragment extends QFragment
             @Override
             public boolean onMarkerClick(Marker marker) {
                 presenter.onMarkerClicked(marker);
-                fabAdd.hide();
                 return false;
             }
         });
@@ -458,25 +456,22 @@ public class QMapFragment extends QFragment
     }
 
     @Override
-    public void onQuestSelected(Quest quest) {
-        questSelectedListener.onQuestSelected(quest);
-        showQuestDetail(quest);
-    }
-
-    @Override
     public void setDefaultLocation(LatLng location) {
         mDefaultLocation = location;
         setCamera(mDefaultLocation, mDefaultZoom);
     }
 
     @Override
-    public void openDetailView() {
+    public void openDetailView(Quest quest) {
+        fabAdd.hide();
+        showQuestDetail(quest);
         final ViewGroup.LayoutParams layoutParams = detailLayout.getLayoutParams();
 
         if (getResources().getConfiguration().orientation != ORIENTATION_PORTRAIT ||
                 layoutParams.height > 0) {
             return;
         }
+        questSelectedListener.onQuestDetailsRequested(quest);
 
         ValueAnimator animateDetailUp = ValueAnimator.ofInt(0, detailViewHeight);
         animateDetailUp.setDuration(ANIMATION_DURATION);

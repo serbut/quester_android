@@ -107,8 +107,7 @@ public class QMapPresenter extends BasePresenter<QMapView>
         Quest quest = mapper.get(marker);
         if (quest != null) {
             if (view() != null) {
-                view().openDetailView();
-                view().onQuestSelected(quest);
+                view().openDetailView(quest);
             }
         }
     }
@@ -222,7 +221,7 @@ public class QMapPresenter extends BasePresenter<QMapView>
         if (view() != null) {
             view().setDefaultLocation(quest.getPoints().getFirst().getCoordinates());
             view().showQuestDetail(quest);
-            view().openDetailView();
+            view().openDetailView(quest);
         }
     }
 
