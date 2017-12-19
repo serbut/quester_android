@@ -83,6 +83,7 @@ public class QuestAddFragment extends QFragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        questSavedListener = null;
     }
 
     @OnClick(R.id.button_quest_create_cancel)

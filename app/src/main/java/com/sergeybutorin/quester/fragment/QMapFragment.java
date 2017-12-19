@@ -53,7 +53,6 @@ public class QMapFragment extends QFragment
         implements QMapView, OnMapReadyCallback {
 
     public static final String TAG = QMapFragment.class.getSimpleName();
-    public static final String QUEST_ARG = "QUEST_ARG";
 
     private final String CAMERA_ZOOM_KEY = "CAMERA_ZOOM_KEY";
     private final String CAMERA_POS_KEY = "CAMERA_POS_KEY";
@@ -109,9 +108,6 @@ public class QMapFragment extends QFragment
         final SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        questAddListener = (QuestAddListener) getActivity();
-        questSelectedListener = (QuestSelectedListener) getActivity();
-
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getContext());
 
         setMaxDetailHeight();
@@ -137,8 +133,6 @@ public class QMapFragment extends QFragment
                 mDefaultLocation = savedInstanceState.getParcelable(CAMERA_POS_KEY);
                 mDefaultZoom = (float) savedInstanceState.getSerializable(CAMERA_ZOOM_KEY);
             }
-
-//            isRestored = true;
         } else {
             presenter = new QMapPresenter();
         }
@@ -191,6 +185,13 @@ public class QMapFragment extends QFragment
     public void onDetach() {
         super.onDetach();
         presenter.unbindView();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        questSelectedListener = null;
+        questAddListener = null;
     }
 
     /**
@@ -437,7 +438,6 @@ public class QMapFragment extends QFragment
                         .position(coordinates)
                         .title("title")
                         .snippet("snippet")
-                        .draggable(true)
                         .icon(BitmapDescriptorFactory
                                 .defaultMarker(BitmapDescriptorFactory.HUE_ROSE))
         );
@@ -452,6 +452,7 @@ public class QMapFragment extends QFragment
 
     @Override
     public void onPointsAdded(Quest quest) {
+        questAddListener = (QuestAddListener) getActivity();
         questAddListener.onPointsAdded(quest);
     }
 
@@ -471,6 +472,7 @@ public class QMapFragment extends QFragment
                 layoutParams.height > 0) {
             return;
         }
+        questSelectedListener = (QuestSelectedListener) getActivity();
         questSelectedListener.onQuestDetailsRequested(quest);
 
         ValueAnimator animateDetailUp = ValueAnimator.ofInt(0, detailViewHeight);
