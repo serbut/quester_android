@@ -2,6 +2,7 @@ package com.sergeybutorin.quester.activity;
 
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -31,6 +32,8 @@ import com.sergeybutorin.quester.model.Quest;
 import com.sergeybutorin.quester.model.UserProfile;
 import com.sergeybutorin.quester.utils.SPHelper;
 
+import java.util.UUID;
+
 import io.fabric.sdk.android.Fabric;
 
 
@@ -39,6 +42,7 @@ public class MainActivity extends AppCompatActivity
         QMapFragment.QuestAddListener,
         QuestAddFragment.QuestSavedListener,
         QMapFragment.QuestSelectedListener {
+
     private TextView nameTextView;
     private TextView emailTextView;
     private MenuItem loginItem;
@@ -124,12 +128,17 @@ public class MainActivity extends AppCompatActivity
 
     private void changeFragment(QFragment fragment, boolean addToBackStack) {
         if (currentFragment == fragment) { return; }
+
         if (fragment instanceof QMapFragment) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
         }
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         if (currentFragment != null) {
-            transaction.hide(currentFragment);
+            if (fragment instanceof QMapFragment) {
+                transaction.remove(currentFragment);
+            } else {
+                transaction.hide(currentFragment);
+            }
         }
         if (fragment.isAdded()) {
             transaction.show(fragment);
@@ -176,10 +185,8 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onQuestSaved(Quest quest) {
-        Bundle args = new Bundle();
-        args.putParcelable(QMapFragment.QUEST_ARG, quest);
-        qMapFragment.setArguments(args);
         changeFragment(qMapFragment, false);
+        qMapFragment.onNewQuestAdded(quest);
     }
 
     public void hideSoftKeyboard() {

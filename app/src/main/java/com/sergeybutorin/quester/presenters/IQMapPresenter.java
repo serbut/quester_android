@@ -23,7 +23,7 @@ public interface IQMapPresenter {
     void newMarkerAdded(Marker marker);
     void mapQuestWithMarker(Quest quest, Marker marker);
     void onViewReady();
-    boolean isQuestAdded();
     boolean isLoggedIn();
-    void setAddedQuest(Quest quest);
+    void addNewQuest(Quest quest);
+    void clearMarkers();
 }

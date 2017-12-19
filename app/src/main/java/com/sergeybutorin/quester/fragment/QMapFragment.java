@@ -145,11 +145,6 @@ public class QMapFragment extends QFragment
         }
 
         presenter.bindView(this);
-
-        Bundle bundle = this.getArguments();
-        if (bundle != null) {
-            presenter.setAddedQuest((Quest) bundle.getParcelable(QUEST_ARG));
-        }
     }
 
     /**
@@ -217,8 +212,7 @@ public class QMapFragment extends QFragment
                         if (task.isSuccessful()) {
                             // Set the map's camera position to the current location of the device.
                             mLastKnownLocation = task.getResult();
-                            if (mLastKnownLocation != null
-                                    && !presenter.isQuestAdded()) {
+                            if (mLastKnownLocation != null) {
                                 setCamera(new LatLng(mLastKnownLocation.getLatitude(),
                                         mLastKnownLocation.getLongitude()), mDefaultZoom);
                             }
@@ -325,12 +319,10 @@ public class QMapFragment extends QFragment
                     fabAdd.hide();
                 }
                 hideMenu();
-//                for (Marker marker : newQuestMarkers) {
-//                    marker.remove();
-//                }
+                presenter.clearMarkers();
                 fabAdd.setClickable(true);
-//                questToAdd.clear();
 //                showQuests();
+
                 break;
             case ADD:
                 showMenu();
@@ -468,6 +460,7 @@ public class QMapFragment extends QFragment
     @Override
     public void onQuestSelected(Quest quest) {
         questSelectedListener.onQuestSelected(quest);
+        showQuestDetail(quest);
     }
 
     @Override
@@ -518,6 +511,11 @@ public class QMapFragment extends QFragment
 
         });
         animateDetailDown.start();
+    }
+
+    @Override
+    public void onNewQuestAdded(Quest quest) {
+        presenter.addNewQuest(quest);
     }
 
     private void setMaxDetailHeight() {

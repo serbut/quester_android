@@ -36,7 +36,6 @@ public class QMapPresenter extends BasePresenter<QMapView>
     private boolean isLoadingData = false;
     private QMapView.QuestState viewState = QMapView.QuestState.DISPLAY;
 
-    private Quest addedQuest;
     private final List<Quest> quests = new LinkedList<>();
     private final LinkedList<Marker> newQuestMarkers = new LinkedList<>();
 
@@ -108,7 +107,6 @@ public class QMapPresenter extends BasePresenter<QMapView>
         Quest quest = mapper.get(marker);
         if (quest != null) {
             if (view() != null) {
-                view().showQuestDetail(quest);
                 view().openDetailView();
                 view().onQuestSelected(quest);
             }
@@ -117,14 +115,6 @@ public class QMapPresenter extends BasePresenter<QMapView>
 
     @Override
     public void onViewReady() {
-        if (addedQuest != null) {
-            String token = QuesterApplication.getSp().getUserToken();
-            saveQuest(addedQuest);
-            controller.add(addedQuest, token);
-            if (view() != null) {
-                view().setDefaultLocation(addedQuest.getPoints().getFirst().getCoordinates());
-            }
-        }
         switchViewState();
 
         // Let's not reload data if it's already here
@@ -210,10 +200,6 @@ public class QMapPresenter extends BasePresenter<QMapView>
         }
     }
 
-    @Override
-    public boolean isQuestAdded() {
-        return addedQuest != null;
-    }
 
     @Override
     public boolean isLoggedIn() {
@@ -227,7 +213,23 @@ public class QMapPresenter extends BasePresenter<QMapView>
     }
 
     @Override
-    public void setAddedQuest(Quest quest) {
-        this.addedQuest = quest;
+    public void addNewQuest(Quest quest) {
+        String token = QuesterApplication.getSp().getUserToken();
+        saveQuest(quest);
+        controller.add(quest, token);
+        viewState = QMapView.QuestState.DISPLAY;
+        switchViewState();
+        if (view() != null) {
+            view().setDefaultLocation(quest.getPoints().getFirst().getCoordinates());
+            view().showQuestDetail(quest);
+            view().openDetailView();
+        }
+    }
+
+    @Override
+    public void clearMarkers() {
+        for (Marker marker : newQuestMarkers) {
+            marker.remove();
+        }
     }
 }
