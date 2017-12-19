@@ -55,13 +55,11 @@ public class QMapPresenter extends BasePresenter<QMapView>
         getQuestListTask.execute();
     }
 
-
     private void loadData() {
         isLoadingData = true;
         QuestsGetTask questsGetTask = new QuestsGetTask(QuesterApplication.getDb(), this);
         questsGetTask.execute();
     }
-
 
     public void addQuest(Quest quest) {
         isSynchronized = true;
@@ -105,11 +103,10 @@ public class QMapPresenter extends BasePresenter<QMapView>
     @Override
     public void onMarkerClicked(Marker marker) {
         Quest quest = mapper.get(marker);
-        if (quest != null) {
-            if (view() != null) {
-                view().openDetailView(quest);
-            }
+        if (quest != null && view() != null) {
+            view().openDetailView(quest);
         }
+
     }
 
     @Override
@@ -120,8 +117,7 @@ public class QMapPresenter extends BasePresenter<QMapView>
         if (!isSynchronized && !isLoadingData) {
             // view().showLoading() you can show progress bar in that method if you want
             loadData();
-        }
-        else if (isSynchronized) {
+        } else if (isSynchronized) {
             if (view() != null) {
                 view().showQuests(this.quests);
             }
@@ -132,7 +128,6 @@ public class QMapPresenter extends BasePresenter<QMapView>
     @Override
     public void newMarkerAdded(Marker marker) {
         newQuestMarkers.add(marker);
-        LatLng position = marker.getPosition();
     }
 
     @Override
@@ -161,15 +156,14 @@ public class QMapPresenter extends BasePresenter<QMapView>
 
     @Override
     public void onDoneButtonClicked() {
+        if (view() == null) {
+            return;
+        }
         if (questToAdd.getPoints().size() < 1) {
-            if (view() != null) {
-                view().showNoPointsInQuest();
-            }
+            view().showNoPointsInQuest();
         } else {
             viewState = QMapView.QuestState.DISPLAY;
-            if (view() != null) {
-                view().onPointsAdded(questToAdd);
-            }
+            view().onPointsAdded(questToAdd);
         }
     }
 
@@ -181,7 +175,6 @@ public class QMapPresenter extends BasePresenter<QMapView>
     public void syncQuest(Quest quest) {
         controller.add(quest, QuesterApplication.getSp().getUserToken());
     }
-
 
     @Override
     public void onAddResult(boolean success, int message, Quest quest) {

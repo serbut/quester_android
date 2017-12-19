@@ -38,17 +38,13 @@ public class QuestDetailFragment extends Fragment {
         ButterKnife.bind(this, view);
 
         Bundle bundle = this.getArguments();
-        if (bundle == null) {
-            throw new IllegalArgumentException();
+        if (bundle != null) {
+            quest = bundle.getParcelable(QUEST_ARG);
+            if (quest != null) {
+                titleTw.setText(quest.getTitle());
+                descriptionTw.setText(quest.getDescription());
+            }
         }
-        quest = bundle.getParcelable(QUEST_ARG);
-
-        if (quest == null) {
-            throw new NullPointerException("Unexpectedly found null while reading quest");
-        }
-        titleTw.setText(quest.getTitle());
-        descriptionTw.setText(quest.getDescription());
-        Log.d("TAG", "Description: " + quest.getDescription());
         return view;
     }
 }
