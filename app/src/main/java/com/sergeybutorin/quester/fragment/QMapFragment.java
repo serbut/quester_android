@@ -512,7 +512,9 @@ public class QMapFragment extends QFragment
 
     @Override
     public void onNewQuestAdded(Quest quest) {
-        presenter.addNewQuest(quest);
+        if (quest != null) {
+            presenter.addNewQuest(quest);
+        }
     }
 
     private void setMaxDetailHeight() {
